@@ -15,6 +15,3 @@ sudo yum -y install openblas-devel openblas-static # install OpenBLAS
 cd hpl-2.2/
 # Copy in the makefile from the appendix now.
 make arch=Linux_SL6_Intel64                        # compile
-
-
-# mpirun -np 4 ~/hpl-2.2/bin/Linux_SL6_Intel64/xhpl
