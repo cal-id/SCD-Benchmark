@@ -5,3 +5,8 @@ This is a python script for running on SCARF and JASMIN. It creates a json file 
 ## Usage
 
 This folder (or at least the output json file) needs to be copied into the top directory for each test on JASMIN and SCARF so that the python scripts can access it.
+
+From **inside the folder** run: `python2.7 parseByHostgroup.py`
+
+
+(for SCARF, it may be necessary to run `module load python/2.7` before)
