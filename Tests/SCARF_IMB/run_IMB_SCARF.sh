@@ -25,7 +25,7 @@ bsub << %EndOfInput%
 #BSUB -e $PWD/outputs/%J.err
 #BSUB -W 0:13
 #BSUB -m "$specificHost"
-mpirun -lsf -prot $pFlag $PWD/imb/imb/src/IMB-MPI1 -iter 1000 -msglog 0:24 -iter_policy off PingPong
+mpirun -lsf -prot $pFlag $PWD/imb/imb/src/IMB-MPI1 -iter 1000 -time 20 -msglog 0:24 -iter_policy off PingPong
 %EndOfInput%
 
             done
