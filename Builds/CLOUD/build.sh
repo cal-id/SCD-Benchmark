@@ -1,3 +1,5 @@
+#! /bin/bash
+
 # Install IMB PingPong
 sudo yum -y install openmpi-devel  # install OpenMPI
 wget https://software.intel.com/sites/default/files/managed/a3/53/IMB_2017.tgz
