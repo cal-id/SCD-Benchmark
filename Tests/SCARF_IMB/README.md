@@ -1,5 +1,8 @@
 # Running IMB on SCARF
 
+## TODO:
+Check about TCP + IBV?
+
 ## Files
 
 * **run_IMB_SCARF.sh** - The script to submit the jobs to SCARF for each hostgroup, accross nodes and within nodes and for a number of repeats
