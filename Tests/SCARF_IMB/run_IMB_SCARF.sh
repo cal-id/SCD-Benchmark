@@ -7,18 +7,16 @@ for specificHost in ${hostgroups[@]}; do # For each hostgroup
         if [ $perTile -eq 1 ]; then
             # If going between nodes, specify different interconnect flags
             pFlagOptions=(-TCP -IBV)
-            numberOfNodes=2 # ... and specify two nodes required
         else
             # If not, there are no interconnect flags
             pFlagOptions=("")
-            numberOfNodes=1 # ... and only one node is required
         fi
 	    for pFlag in "${pFlagOptions[@]}"; do # Step through interconnect flags
             for repeat in 1 2 3 4 5; do # repeat the benchmark
 
 bsub << %EndOfInput%
 #BSUB -x
-#BSUB -n $numberOfNodes
+#BSUB -n 2
 #BSUB -R "span[ptile=$perTile]"
 #BSUB -J PingPong
 #BSUB -o $PWD/outputs/%J.out
