@@ -13,13 +13,13 @@
 * **buildIMB.sh** - a script to install IMB on JASMIN and SCARF
 
 ### Location of HPL
-On LOTUS: `/apps/src/hpl/hpl-2.2/bin/Linux_Intel64/xhpl`
-On SCARF: `/apps/procspec/hpl/2.2/bin/Linux_Intel64/xhpl`
+* LOTUS: `/apps/src/hpl/hpl-2.2/bin/Linux_Intel64/xhpl`
+* SCARF: `/apps/procspec/hpl/2.2/bin/Linux_Intel64/xhpl`
 
 ## Tests
 ### For HPL and IMB
 | Infrastructure | within nodes | between two nodes |
 | -------------- | ------------ | ----------------- |
-| SCARF          | TODO         | TODO              |
+| SCARF          | IMB not HPL  | IMB not HPL       |
 | JASMIN         | TODO         | TODO              |
 | Cloud          | TODO         | TODO              |
