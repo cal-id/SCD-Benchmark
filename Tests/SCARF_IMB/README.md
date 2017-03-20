@@ -1,7 +1,6 @@
 # Running IMB on SCARF
 
 ## TODO:
-Check about TCP + IBV?
 Check about -time flag -time <seconds per message>
 
 ## Files
