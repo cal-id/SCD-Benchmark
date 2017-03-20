@@ -23,3 +23,7 @@
 | SCARF          | IMB not HPL  | IMB not HPL       |
 | JASMIN         | TODO         | TODO              |
 | Cloud          | TODO         | TODO              |
+
+### Useful scripts
+* **parseHostGroups/parseByHostgroup.py** - a script to create a json file mapping hosts to hostgroups for LSF (SCARF and JASMIN)
+* **makeClean.sh** - a script to remove .err files from `outputs/` (a subdirectory of where it is run from)
