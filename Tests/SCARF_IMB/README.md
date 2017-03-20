@@ -7,7 +7,6 @@ Check about -time flag -time <seconds per message>
 
 * **run_IMB_SCARF.sh** - The script to submit the jobs to SCARF for each hostgroup, accross nodes and within nodes and for a number of repeats
 * **toCSV.py** - A python script to parse the output files under `outputs/` to a CSV file with the useful information.
-* **makeClean.sh** - A script to remove the empty error files from `outputs/`
 
 ## Setup / Dependencies
 1. Create a top directory in home eg `/home/cseg/scarf565/SCARF_IMB`
