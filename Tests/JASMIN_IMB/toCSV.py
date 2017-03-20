@@ -4,8 +4,7 @@ import json
 
 
 # import the hostgroup information from a file
-with open(("/home/cseg/scarf565/hplTestConfig/parseHostGroups/"
-          "hostGroupsByHostname.json"), "r") as fHandle:
+with open("parseHostGroups/hostGroupsByHostname.json", "r") as fHandle:
     hostGroupsFromHost = json.loads(fHandle.read())
 
 # set up the headers for the csv files
