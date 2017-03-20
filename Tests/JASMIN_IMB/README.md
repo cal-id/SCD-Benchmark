@@ -3,7 +3,7 @@
 ## Files
 
 * **run_IMB_JASMIN.sh** - The script to submit the jobs to SCARF for each hostgroup, accross nodes and within nodes and for a number of repeats
-* **toCSV.py** - A python script to parse the output files under `outputs/` to a CSV file with the useful information.
+* **toCSV.py** - A python script to parse the output files under `outputs/` to a CSV file with the useful information. Note this differs slightly from the SCARF version because they have slightly different lsf outputs (JASMIN doesn't give `Turnaround time` or `Run time`).
 * **makeClean.sh** - A script to remove the empty error files from `outputs/`
 
 ## Setup / Dependencies

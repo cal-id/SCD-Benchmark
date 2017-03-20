@@ -17,9 +17,7 @@ RESOURCEOUTPUTS = [
     ("Delta Memory", "MB"),
     ("Max Swap", "MB"),
     ("Max Processes", ""),
-    ("Max Threads", ""),
-    ("Run time", "sec."),
-    ("Turnaround time", "sec.")
+    ("Max Threads", "")
 ]
 
 PROTOCOLHEADERS = ["Protocols Seen"]
