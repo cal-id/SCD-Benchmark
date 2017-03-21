@@ -19,6 +19,26 @@ import json  # to dump into json
 # The directory to save the files to.
 OUTPUT_DIRECTORY = os.getcwd()  # for the moment use the current directory
 
+# Ignore host if these any of these strings are in it
+HOST_LIKE_IGNORE = ["gpu"]
+
+# Ignore host group if any of these strings are in it
+# By trial and error, excluding these hosts seem to helpfully
+# map host -> hostgroup one to one
+HG_LIKE_IGNORE = ['scarf_intel_hosts_7_isis', 'lotus241', 'lotus2', 'lotus3',
+                  'lotusf10', 'lotus_newton', 'atsrrepro', 'lotus_highmem',
+                  'lotustest']
+
+# If any of these keys are in the host group then replace with the value
+HG_LIKE_ALIAS = {
+    "scarf_intel_hosts_4": "scarf10",
+    "scarf_intel_hosts_5": "scarf11",
+    "scarf_intel_hosts_6": "scarf12",
+    "scarf_intel_hosts_7": "scarf13",
+    "scarf_intel_hosts_8": "scarf14",
+    "scarf_15_hosts": "scarf15"
+}
+
 
 # --------------------------------- FUNCTIONS ---------------------------------
 def getHostGroups():
@@ -26,7 +46,7 @@ def getHostGroups():
     The function calls bmgroup to get this information.
 
     example return:
-        {host100: ["lotus", "lotus2"], host201: ["testHostGroup"]}'''
+        {host100: "lotus lotus2", host201: "testHostGroup"}'''
     print("Getting host groups")
     # Get the binary output from bmgroup
     # -w for wide output (don't clip strings)
@@ -42,9 +62,18 @@ def getHostGroups():
         columnsInThisLine = line.split()
         hosts = columnsInThisLine[1:]
         hostGroup = columnsInThisLine[0]
+        if any(ignoreString in hostGroup for ignoreString in HG_LIKE_IGNORE):
+            # Ignore some host groups
+            continue
+        for initial, replacement in HG_LIKE_ALIAS.items():
+            # Deal with the aliases
+            if initial in hostGroup:
+                hostGroup = replacement
+                break
         for host in hosts:
             # Step through each host for this host group
-            if "gpu" in host:  # ignore gpu for the moment
+            if any(ignoreString in host for ignoreString in HOST_LIKE_IGNORE):
+                # Don't do anything with the hosts to ignore
                 continue
             if host in toReturn:
                 # If this host is already mapped to a list of host groups,
