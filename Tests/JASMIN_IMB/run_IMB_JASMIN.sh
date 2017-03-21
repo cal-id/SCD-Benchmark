@@ -15,9 +15,9 @@ bsub << %EndOfInput%
 #BSUB -J PingPong
 #BSUB -o $PWD/outputs/%J.out
 #BSUB -e $PWD/outputs/%J.err
-#BSUB -W 0:30
+#BSUB -W 0:45
 #BSUB -m "$specificHost"
-mpirun.lotus -prot $PWD/imb/imb/src/IMB-MPI1 -iter 1000 -time 70 -msglog 0:24 -iter_policy off PingPong
+mpirun.lotus -prot $PWD/imb/imb/src/IMB-MPI1 -iter 1000 -time 200 -msglog 0:24 -iter_policy off PingPong
 %EndOfInput%
 
         done

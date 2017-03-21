@@ -34,7 +34,7 @@ fi
 
 
 # Run the benchmark
-mpirun -np 2 $multiHostFlags $HOME_DIR/imb/imb/src/IMB-MPI1 -iter 1000 -msglog 0:24 -iter_policy off -time 35 PingPong 2> $errorFile >> $outputFile
+mpirun -np 2 $multiHostFlags $HOME_DIR/imb/imb/src/IMB-MPI1 -iter 1000 -msglog 0:24 -iter_policy off -time 200 PingPong 2> $errorFile >> $outputFile
 
 # Increment the count file
 echo $(($(cat $COUNT) + 1)) > $COUNT
