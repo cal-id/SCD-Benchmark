@@ -20,7 +20,7 @@ bsub << %EndOfInput%
 . /etc/profile.modules
 module load intel/15.1
 module load intel/mkl/11.3.1.150
-mpirun.lotus -e LD_LIBRARY_PATH=$LD_LIBRARY_PATH -prot /apps/src/hpl/hpl-2.2/bin/Linux_Intel64/xhpl
+mpirun.lotus -e LD_LIBRARY_PATH=\$LD_LIBRARY_PATH -prot /apps/src/hpl/hpl-2.2/bin/Linux_Intel64/xhpl
 %EndOfInput%
 
         done
