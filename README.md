@@ -24,7 +24,7 @@ Tests contains the files / scripts to run each of the benchmarks over the differ
 | -------------- | --- | --- |
 | SCARF          | yes | yes |
 | JASMIN         | yes | yes |
-| Cloud          | yes  | yes |
+| Cloud          | yes | yes |
 
 ### Useful scripts
 * **parseHostGroups/parseByHostgroup.py** - a script to create a json file mapping hosts to hostgroups for LSF (SCARF and JASMIN)
