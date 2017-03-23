@@ -1,0 +1,12 @@
+# Running HPL on SCARF
+
+## Files
+* **run_HPL_JASMIN.sh** - The script to submit the jobs to JASMIN for each hostgroup, accross nodes and within nodes and for a number of repeats
+* **toCSV.py** - A python script to parse the output files under `outputs/` to a CSV file with the useful information.
+
+## Setup / Dependencies
+1. Create a top directory in home and move to it eg `/home/users/ciddon/JASMIN_HPL`
+2. Copy in `parseHostGroups/hostGroupsByHostname.json` - a json file mapping each host to its hostgroups
+3. Copy in `HPL.dat` from `Configure_HPL` - the HPL config file
+4. Run **run_HPL_JASMIN.sh** from inside the top directory to submit the jobs
+5. Run `python toCSV.py` to create a csv file of the output

@@ -1,5 +1,6 @@
 # Benchmarking
 ## Builds
+Builds contains the instructions / scripts to install the benchmarks (particularly on the cloud).
 ### Cloud
 
 * **build.sh** - the build script to install IMB and HPL
@@ -17,11 +18,12 @@
 * SCARF: `/apps/procspec/hpl/2.2/bin/Linux_Intel64/xhpl`
 
 ## Tests
+Tests contains the files / scripts to run each of the benchmarks over the different infrastructures.
 ### Completed
 | Infrastructure | HPL | IMB |
 | -------------- | --- | --- |
 | SCARF          | yes | yes |
-| JASMIN         | no  | yes |
+| JASMIN         | yes | yes |
 | Cloud          | no  | yes |
 
 ### Useful scripts
@@ -32,7 +34,7 @@
 Under `Configure_HPL/HPL.dat` is the configuration file used for all HPL tests.
 
 ## Results
-
+Results contains the results of the tests accross the different infrastructures.
 ### Results for
 #### IMB
 * SCARF
