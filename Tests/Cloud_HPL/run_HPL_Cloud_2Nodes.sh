@@ -11,6 +11,7 @@ COUNT=$START_DIR/count
 
 # Make the output directory if needed
 mkdir -p $START_DIR/outputs
+cd $START_DIR
 
 num=$(date +"%Y%m%d_%H%M%S")
 outputFile=$START_DIR/outputs/$num.out
