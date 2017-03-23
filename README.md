@@ -17,12 +17,12 @@
 * SCARF: `/apps/procspec/hpl/2.2/bin/Linux_Intel64/xhpl`
 
 ## Tests
-### For HPL and IMB
-| Infrastructure | within nodes | between two nodes |
-| -------------- | ------------ | ----------------- |
-| SCARF          | IMB, HPL     | IMB, HPL          |
-| JASMIN         | IMB not HPL  | IMB not HPL       |
-| Cloud          | IMB not HPL  | IMB not HPL       |
+### Completed
+| Infrastructure | HPL | IMB |
+| -------------- | --- | --- |
+| SCARF          | yes | yes |
+| JASMIN         | no  | yes |
+| Cloud          | no  | yes |
 
 ### Useful scripts
 * **parseHostGroups/parseByHostgroup.py** - a script to create a json file mapping hosts to hostgroups for LSF (SCARF and JASMIN)
