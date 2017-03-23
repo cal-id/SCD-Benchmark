@@ -3,7 +3,7 @@ import re
 
 # set up the headers for the csv files
 
-HEADERS = ["File Name", "Number Of Hosts", "Latency"]
+HEADERS = ["File Name", "Number of Hosts", "Latency"]
 
 
 outputFiles = os.listdir("outputs")
