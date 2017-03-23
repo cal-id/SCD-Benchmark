@@ -3,7 +3,7 @@ and the Cloud in SCD.
 not_used     output file name (if any)
 6            device out (6=stdout,7=stderr,file)
 1            # of problems sizes (N)
-47434        Ns
+44640        Ns
 1            # of NBs
 180          NBs
 0            PMAP process mapping (0=Row-,1=Column-major)

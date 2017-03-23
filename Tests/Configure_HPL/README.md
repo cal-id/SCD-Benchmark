@@ -8,7 +8,7 @@ Sources [1](http://www.netlib.org/benchmark/hpl/tuning.html#tips) [2](http://www
 3. The output file name (not used)
 4. Specify `stout`
 5. Only giving one problem size
-6. `20GB` is avaliable as RAM on the cloud (minimum accross SCARF, Cloud and JASMIN). This is `2.50x10^9` double precision elements. 90% of this number is `2.25x10^9`. The square root is `47434` so this is a rough value for N. [2] The actual value should be the nearest multiple of NB [2] so 47520
+6. `20GB` is avaliable as RAM on the cloud (minimum accross SCARF, Cloud and JASMIN). This is `2.50x10^9` double precision elements. 80% of this number is `2x10^9`. The square root is `44721` so this is a rough value for N. [2] The actual value should be the nearest multiple of NB [2] so `44640`
 7. Only giving one NB
 8. NB should be in the range `[32 ... 256]` from initial testing, `180` was chosen
 9. Row-major is recommended [1]
