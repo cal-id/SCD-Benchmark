@@ -9,5 +9,5 @@
 2. Run `bsub -m scarf10 "cp /apps/procspec/hpl/2.2/bin/Linux_Intel64/xhpl ."` to copy SCARF10's executable
 3. Copy in `parseHostGroups/hostGroupsByHostname.json` - a json file mapping each host to its hostgroups
 4. Copy in `HPL.dat` from `Configure_HPL` - the HPL config file
-4. Run **run_HPL_SCARF.sh** from inside the top directory to submit the jobs
-5. Run `python toCSV.py` to create a csv file of the output
+5. Run **run_HPL_SCARF.sh** from inside the top directory to submit the jobs
+6. Run `python toCSV.py` to create a csv file of the output
