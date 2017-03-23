@@ -1,7 +1,7 @@
 # Running IMB on Cloud
 
 ## Files
-* **run_IMB_Cloud.sh** - The script to load the mpi modules and run IMB on either one vm or two.
+* **run_IMB_Cloud.sh** - The script to load the mpi modules and run IMB on either one vm or two (depending on the value of `./count`).
 * **toCSV.py** - A script to parse the output for files under `outputs/` to a CSV file with the userful information
 
 ## Setup / Dependencies
