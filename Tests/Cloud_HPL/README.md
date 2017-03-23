@@ -17,7 +17,7 @@ This requires one cloud VM with at least 4 CPUs and 20GB of RAM
 6. If it isn't the first time running these tests, delete the previous count file `rm -f count`
 7. Setup a crontab to run the script `crontab -e` eg.
     ```bash
-    05,25,45 * * * * /home/tan49775/Cloud_HPL/run_HPL_Cloud_1Node.sh
+    50 * * * * /home/tan49775/Cloud_HPL/run_HPL_Cloud_1Node.sh
     ```
 8. Run `python toCSV.py` to create a csv file of the output
 
