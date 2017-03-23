@@ -20,10 +20,30 @@
 ### For HPL and IMB
 | Infrastructure | within nodes | between two nodes |
 | -------------- | ------------ | ----------------- |
-| SCARF          | IMB not HPL  | IMB not HPL       |
-| JASMIN         | TODO         | TODO              |
-| Cloud          | TODO         | TODO              |
+| SCARF          | IMB, HPL     | IMB, HPL          |
+| JASMIN         | IMB not HPL  | IMB not HPL       |
+| Cloud          | IMB not HPL  | IMB not HPL       |
 
 ### Useful scripts
 * **parseHostGroups/parseByHostgroup.py** - a script to create a json file mapping hosts to hostgroups for LSF (SCARF and JASMIN)
 * **makeClean.sh** - a script to remove .err files from `outputs/` (a subdirectory of where it is run from)
+
+### HPL configuration
+Under `Configure_HPL/HPL.dat` is the configuration file used for all HPL tests.
+
+## Results
+
+### Results for
+#### IMB
+* SCARF
+* Cloud
+
+### To Do Analysis
+### To Get Results
+#### IMB
+* JASMIN
+
+#### HPL
+* SCARF
+* JASMIN
+* Cloud
