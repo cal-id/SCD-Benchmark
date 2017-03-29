@@ -1,5 +1,5 @@
 #! /bin/bash
-oneHost=${1:-out.csv}
+oneHost=${1:-out1.csv}
 twoHost=${2:-out2.csv}
 # Catch error if either file doesn't exist or is 0 length
 if [ ! -s $oneHost -o ! -s $twoHost ]; then

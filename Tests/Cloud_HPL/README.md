@@ -10,7 +10,7 @@
 This requires one cloud VM with at least 4 CPUs and 20GB of RAM
 
 1. Create a top directory under the main VM eg `/home/tan49775/Cloud_HPL`
-2. Install HPL in the home directory of both VMs using **build.sh** (note that it depends on `openmpi-devel` in the IMB section (or just install both by running the script))
+2. Install HPL in the home directory of both VMs using **build.sh** (note that it depends on `openmpi-devel` and sourcing the modules in the IMB section (making it easier to follow the whole script rather than just the HPL section))
 3. Copy in the `HPL.dat` from `Configure_HPL`
 4. Change `HOME_DIR` and `START_DIR` in **run_HPL_Cloud_1Node.sh**
 5. Make script executable `chmod 755 run_HPL_Cloud_1Node.sh`
@@ -31,3 +31,12 @@ This requires 2 cloud VMs with at least 10GB of RAM and 2 CPUs each
     50 * * * * /home/tan49775/Cloud_HPL/run_HPL_Cloud_2Nodes.sh
     ```
 4. Run the python script as above (step 8)
+
+### Combining
+The script `mergeCSVs.sh` can be used to join the two csv files and include the number of hosts. The first csv file provided (default `out1.csv`) is the results for one host. The second provided (default `out2.csv`) is the csv file for two hosts. It outputs to standard out.
+
+A typical use, sending the merged csv to `out.csv`:
+
+```bash
+./mergeCSVs.sh outputsOneHost.csv outputsTwoHost.csv > out.csv
+```
