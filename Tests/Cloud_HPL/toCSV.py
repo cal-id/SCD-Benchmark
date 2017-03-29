@@ -1,11 +1,4 @@
 import os
-import re
-import json
-
-
-# import the hostgroup information from a file
-with open("parseHostGroups/hostGroupsByHostname.json", "r") as fHandle:
-    hostGroupsFromHost = json.loads(fHandle.read())
 
 # Set up the headers for the csv files
 HPLOUTPUTS = ['T/V', 'N', 'NB', 'P', 'Q', 'Time', 'Gflops']
@@ -38,6 +31,7 @@ for outputFile in os.listdir("outputs"):
             thisRow += line.split()
             break
         countDown -= 1
+    outputText += ",".join(thisRow) + "\n"
 
 
 with open("out.csv", "w") as fHandle:
