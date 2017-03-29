@@ -2,7 +2,7 @@
 oneHost=${1:-out.csv}
 twoHost=${2:-out2.csv}
 # Catch error if either file doesn't exist or is 0 length
-if [! (-s $oneHost -a -s $twoHost)]; then
+if [ ! -s $oneHost -o ! -s $twoHost ]; then
     echo "Usage: mergeCSVs.sh <csv - one host (out.csv)> <csv - two hosts(out2.csv)>"
     exit 1
 fi;
