@@ -39,13 +39,14 @@ Results contains the results of the tests accross the different infrastructures.
 #### IMB
 * SCARF
 * Cloud
+#### HPL
+* Cloud
+* SCARF
 
 ### To Do Analysis
-### To Get Results
+### To Do Get Results
 #### IMB
 * JASMIN
 
 #### HPL
-* SCARF
 * JASMIN
-* Cloud
