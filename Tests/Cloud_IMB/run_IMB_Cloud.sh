@@ -28,6 +28,7 @@ if [ $(cat $COUNT) -gt $((2 * $REPEATS_FOR_EACH)) ]; then exit 0; fi
 # If done enough repeats for one host then use two hosts
 if [ $(cat $COUNT) -gt $REPEATS_FOR_EACH ]; then
     echo "#HOSTS=2" > $outputFile
+    # Edit the two host addresses here as necessary
     multiHostFlags="--prefix /usr/lib64/openmpi-1.10/ --map-by node  --rank-by node --host vm275.nubes.stfc.ac.uk,vm15.nubes.stfc.ac.uk"
 else # Otherwise only use this host
     echo "#HOSTS=1" > $outputFile
