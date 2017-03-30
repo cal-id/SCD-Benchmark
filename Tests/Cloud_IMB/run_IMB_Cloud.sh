@@ -1,13 +1,16 @@
 #! /bin/bash
 
+# Enable the module command
 source /etc/profile.d/modules.sh
+# Use the module command to set the mpi env
 module load openmpi-1.10-x86_64
 
+# Set up some variables
 REPEATS_FOR_EACH=30
+# Set HOME_DIR and START_DIR to the top directory
 HOME_DIR=/home/tan49775  # should contain imb/imb/src.. and Cloud_IMB
 START_DIR=$HOME_DIR/Cloud_IMB
 COUNT=$START_DIR/count
-
 
 # Make the output directory if needed
 mkdir -p $START_DIR/outputs
@@ -30,8 +33,6 @@ else # Otherwise only use this host
     echo "#HOSTS=1" > $outputFile
     multiHostFlags=""
 fi
-
-
 
 # Run the benchmark
 mpirun -np 2 $multiHostFlags $HOME_DIR/imb/imb/src/IMB-MPI1 -iter 1000 -msglog 0:24 -iter_policy off -time 200 PingPong 2> $errorFile >> $outputFile

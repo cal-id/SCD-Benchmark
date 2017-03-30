@@ -11,7 +11,7 @@ This requires two cloud VMs, the main one needs at least two CPUs (to run PingPo
 2. Setup ssh between the two VMs following **setupSSH.sh**
 3. Install IMB in the home directory of both VMs using **build.sh**
 4. Change `HOME_DIR` and `START_DIR` in **run_IMB_Cloud.sh**
-5. Change the host addresses on line 28 in **run_IMB_Cloud.sh**
+5. Change the host addresses in **run_IMB_Cloud.sh**
 6. Make script executable `chmod 755 run_IMB_Cloud.sh`
 7. If it isn't the first time running these tests, delete the previous count file `rm -f count`
 8. Setup a crontab to run the script `crontab -e` eg.
