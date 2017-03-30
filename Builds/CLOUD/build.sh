@@ -7,7 +7,7 @@ tar -xvf IMB_2017.tgz
 source /etc/profile.d/modules.sh   # enable environment-modules
 module load openmpi-1.10-x86_64    # load the MPI module
 cd imb/imb/src
-make all CC=mpicc                  # compile
+make CC=mpicc                  # compile
 cd -
 
 # Install HPL
