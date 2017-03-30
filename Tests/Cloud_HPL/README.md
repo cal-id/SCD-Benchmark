@@ -6,6 +6,10 @@
 * **toCSV.py** - A script to parse the output for files under `outputs/` to a CSV file with the userful information
 
 ## Setup / Dependencies
+###
+NOTE: The SCD cloud limits a maximum of 20GB of RAM at a time. So I did the tests accross two VMs (10GB each) then deleted the VMs and did the tests over one VM (20GB)
+
+
 ### 1 Node
 This requires one cloud VM with at least 4 CPUs and 20GB of RAM
 
