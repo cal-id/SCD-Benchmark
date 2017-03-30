@@ -1,5 +1,4 @@
 #! /bin/bash
-# westmere48G doesn't work, removed it
 hostgroups=(ivybridge512G ivybridge2000G haswell256G ivybridge128G broadwell256G)
 # Make the outputs directory if it doesn't exist
 mkdir -p $PWD/outputs
