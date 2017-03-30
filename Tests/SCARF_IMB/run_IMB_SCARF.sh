@@ -11,8 +11,8 @@ for specificHost in ${hostgroups[@]}; do # For each hostgroup
             # If not, there are no interconnect flags
             pFlagOptions=("")
         fi
-	    for pFlag in "${pFlagOptions[@]}"; do # Step through interconnect flags
-            for repeat in 1 2 3 4 5; do # repeat the benchmark
+        for pFlag in "${pFlagOptions[@]}"; do # Step through interconnect flags
+            for repeat in 1 2 3 4 5; do # Repeat the benchmark
 
 bsub << %EndOfInput%
 #BSUB -x
