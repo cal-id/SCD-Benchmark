@@ -1,0 +1,120 @@
+Sender: LSF System <lsfadmin@cn064.scarf.rl.ac.uk>
+Subject: Job 484390: <PingPong> in cluster <sctsc> Done
+
+Job <PingPong> was submitted from host <scarf.rl.ac.uk> by user <scarf565> in cluster <sctsc>.
+Job was executed on host(s) <2*cn064.scarf.rl.ac.uk>, in queue <scarf>, as user <scarf565> in cluster <sctsc>.
+</home/cseg/scarf565> was used as the home directory.
+</home/cseg/scarf565/SCARF_IMB_RUN3> was used as the working directory.
+Started at Results reported on 
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+#BSUB -x
+#BSUB -n 2
+#BSUB -R "span[ptile=2]"
+#BSUB -J PingPong
+#BSUB -o /home/cseg/scarf565/SCARF_IMB_RUN3/outputs/%J.out
+#BSUB -e /home/cseg/scarf565/SCARF_IMB_RUN3/outputs/%J.err
+#BSUB -W 0:45
+#BSUB -m "scarf10"
+mpirun -lsf -prot numactl --cpunodebind=0 -- /home/cseg/scarf565/SCARF_IMB_RUN3/imb/imb/src/IMB-MPI1 -iter 1000 -time 200 -msglog 0:24 -iter_policy off PingPong
+
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   78.48 sec.
+    Max Memory :                                 13.45 MB
+    Average Memory :                             13.45 MB
+    Total Requested Memory :                     -
+    Delta Memory :                               -
+    Max Swap :                                   563 MB
+    Max Processes :                              7
+    Max Threads :                                9
+    Run time :                                   48 sec.
+    Turnaround time :                            15027 sec.
+
+The output (if any) follows:
+
+Host 0 -- ip 130.246.136.64 -- ranks 0 - 1
+
+ host | 0
+======|======
+    0 : SHM
+
+ Prot -  All Intra-node communication is: SHM
+
+#------------------------------------------------------------
+#    Intel (R) MPI Benchmarks 2017, MPI-1 part    
+#------------------------------------------------------------
+# Date                  : Fri Mar 24 20:43:02 2017
+# Machine               : x86_64
+# System                : Linux
+# Release               : 2.6.32-642.15.1.el6.x86_64
+# Version               : #1 SMP Mon Feb 20 02:26:38 EST 2017
+# MPI Version           : 2.2
+# MPI Thread Environment: 
+
+
+# Calling sequence was: 
+
+# /home/cseg/scarf565/SCARF_IMB_RUN3/imb/imb/src/IMB-MPI1 -iter 1000 -time 200 -msglog 0:24
+#                                                         -iter_policy off PingPong
+
+# Minimum message length in bytes:   0
+# Maximum message length in bytes:   16777216
+#
+# MPI_Datatype                   :   MPI_BYTE 
+# MPI_Datatype for reductions    :   MPI_FLOAT
+# MPI_Op                         :   MPI_SUM  
+#
+#
+
+# List of Benchmarks to run:
+
+# PingPong
+
+#---------------------------------------------------
+# Benchmarking PingPong 
+# #processes = 2 
+#---------------------------------------------------
+       #bytes #repetitions      t[usec]   Mbytes/sec
+            0         1000         0.17         0.00
+            1         1000         0.14         6.99
+            2         1000         0.14        14.07
+            4         1000         0.15        25.87
+            8         1000         0.14        56.34
+           16         1000         0.13       113.48
+           32         1000         0.14       221.84
+           64         1000         0.18       331.61
+          128         1000         0.22       548.77
+          256         1000         0.23      1084.75
+          512         1000         0.26      1874.60
+         1024         1000         0.50      1941.69
+         2048         1000         0.84      2332.24
+         4096         1000         1.28      3049.32
+         8192         1000         2.07      3766.00
+        16384         1000         4.07      3835.21
+        32768         1000         5.76      5422.47
+        65536         1000         9.43      6626.74
+       131072         1000        16.77      7454.26
+       262144         1000        34.25      7299.70
+       524288         1000        68.60      7288.57
+      1048576         1000       134.90      7413.09
+      2097152         1000       371.89      5377.99
+      4194304         1000       892.87      4479.93
+      8388608         1000      2711.12      2950.81
+     16777216         1000      5414.15      2955.22
+
+
+# All processes entering MPI_Finalize
+
+
+
+PS:
+
+Read file </home/cseg/scarf565/SCARF_IMB_RUN3/outputs/484390.err> for stderr output of this job.
+
