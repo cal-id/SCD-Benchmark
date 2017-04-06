@@ -46,6 +46,12 @@ sorting=ynt
 \setminted{bgcolor=code-bg}
 
 \maketitle
+
+\begin{abstract}
+This is the abstract which is definitely TODO!
+\end{abstract}
+
+
 \tableofcontents
 
 \section{Introduction}
@@ -64,6 +70,7 @@ sorting=ynt
 \section{Methods}
 
     \subsection{Overview}
+    \label{overview-of-methods}
     There are two benchmarking applications to run on each system.
 
     \begin{description}
@@ -79,7 +86,7 @@ sorting=ynt
         \subsubsection{Cloud} \label{cloud-installation}
 
         \paragraph{}
-        An SL6 no GUI virtual machine was used. The MPI library was OpenMPI and the linear algebra library was OpenBLAS (both from yum). A makefile was created to link to these libraries which is included in the appendices.
+        An SL6 no GUI virtual machine was used. The MPI library was OpenMPI and the linear algebra library was OpenBLAS (both from yum). A makefile was created to link to these libraries (Appendix \ref{appendix:makefile}).
 
             \begin{code}
             \captionof{listing}{Installing IMB and HPL on a Cloud VM}
@@ -142,19 +149,34 @@ gmake all CC=mpicc
 
         On SCARF, HPL is optimised for each processor at \verb|/apps/procspec/hpl/2.2/bin/Linux_Intel64/xhpl|, to avoid this optimisation advantage, the SCARF10 (least optimised) version was used for all processors by copying this binary to a shared location between processors (see section \ref{running-HPL-SCARF}).
 
+
+
+
     \subsection{Running IMB PingPong}
 
-    \paragraph{}
-    Using the LSF scheduler on LOTUS and SCARF, benchmarks are submitted as jobs using shell scripts that start by specifying parameters. On the Cloud, a cronjob wraps running the benchmark by choosing whether to run on just one VM or two VMs based on the number of repeats so far.
+        \paragraph{}
+        In general, the benchmarks are submitted by shell scripts that take care of configuration parameters, platform specific parameters (eg LSF flags) and running repeats of the benchmarks. On the systems where there is a job scheduler (LOTUS and SCARF), these scripts submit the jobs where the benchmarks are actually run. On the Cloud, a cronjob is setup to run the script at regular intervals.
+
+        \subsubsection{Configuration}
+
+        \paragraph{}
+        There is no configuration file required for the IMB benchmarks but a number of command line options are available.
+
+        \begin{description}
+            \item[iter n] ensures that \verb|n| repeats of each message size are taken and averaged. 1000 was chosen because it was the largest number of repeats that maintained a reasonable time to run on the slowest infrastructure (Cloud, between two VMs). It was also the default for smaller message sizes.
+            \item[time t] sets a maximum time \verb|t|(s) for all repeats of a message size. 200 was chosen because it is significantly high such that this maximum was never reached.
+            \item[msglog a:b] sets a minimum and maximum ($2^{a}$, $2^{b}$ respectively) for the message sizes.
+            \item[iter\_policy] sets the behaviour with large message sizes and whether to reduce the number of repeats. Given that the number of repeats is feasible, setting this to \verb|off| means that the same number of repeats are tested for each message size.
+        \end{description}
 
         \subsubsection{SCARF}
             \begin{enumerate}
-                \item Create a top directory and \verb|cd| into it (e.g. \verb|/home/cseg/scarf565/SCARF_IMB|)
-                \item Install IMB PingPong inside this directory as explained previously (Code \ref{code:builds-cloud-build-sh}). This should create \verb|imb/imb/src/IMB-MPI1|.
-                \item Submit jobs to run the benchmark for 5 repeats across each host group. For each host group, run the benchmark between hosts using TCP, using Infiniband and on the same host
+                \item Create a top directory and \verb|cd| into it (e.g. \verb|/home/cseg/scarf565/SCARF_IMB|).
+                \item Install IMB PingPong inside this directory as in Code \ref{code:builds-cloud-build-sh}. This should create \verb|imb/imb/src/IMB-MPI1|.
+                \item Submit jobs to run the benchmark for five repeats across each host group. For each host group, run the benchmark between hosts using TCP, using Infiniband and on the same host. Use Code \ref{code:tests-scarf_imb-runimbscarf-sh} from inside the top directory.
                     \begin{code}
-                    \captionof{listing}{Submitting IMB Benchmarks to SCARF}
-                    \label{code:tests-scarf_imb-runimbfromscarf-sh}
+                    \captionof{listing}{Submitting IMB to SCARF}
+                    \label{code:tests-scarf_imb-runimbscarf-sh}
                     \begin{minted}[breaklines=true]{bash}
 #! /bin/bash
 hostgroups=(scarf10 scarf11 scarf12 scarf13 scarf14 scarf15 scarf16)
@@ -191,15 +213,19 @@ done
 
                 \end{minted}
                 \end{code}
-                \item This will create \verb|.err| and \verb|.out| files for each run of the benchmark under a directory \verb|outputs/|
+                \item This will create \verb|.err| and \verb|.out| files for each run of the benchmark under a directory \verb|outputs/|.
             \end{enumerate}
         \subsubsection{LOTUS}
             The method for running IMB PingPong on LOTUS is similar but there is no Infiniband available and there is a different \verb|mpirun| command.
 
             \begin{enumerate}
-                \item Create a top directory and \verb|cd| into it (e.g. \verb|/home/users/ciddon/JASMIN_IMB|)
-                \item Install IMB PingPong inside this directory as explained previously (Code \ref{code:builds-cloud-build-sh}). This should create \verb|imb/imb/src/IMB-MPI1|.
-                \item Submit jobs to run the benchmark for 5 repeats across each host group. For each host group, run the benchmark between hosts and within the same host.
+                \item Create a top directory and \verb|cd| into it (e.g. \verb|/home/users/ciddon/JASMIN_IMB|).
+                \item Install IMB PingPong inside this directory as in Code \ref{code:builds-cloud-build-sh}. This should create \verb|imb/imb/src/IMB-MPI1|.
+                \item Submit jobs to run the benchmark for 5 repeats across each host group. For each host group, run the benchmark between hosts and within the same host. Use Code \ref{code:tests-jasmin_hpl-runimbjasmin-sh} from inside the top directory.
+
+                    \begin{code}
+                    \captionof{listing}{Submitting IMB to LOTUS}
+                    \label{code:tests-jasmin_hpl-runimbjasmin-sh}
                     \begin{minted}[breaklines=true]{bash}
 #! /bin/bash
 hostgroups=(ivybridge512G ivybridge2000G haswell256G ivybridge128G broadwell256G)
@@ -226,20 +252,24 @@ mpirun.lotus -prot $PWD/imb/imb/src/IMB-MPI1 -iter 1000 -time 200 -msglog 0:24 -
     done
 done
                     \end{minted}
+                    \end{code}
                 \item This creates the same \verb|.out| and \verb|.err| files as above.
             \end{enumerate}
         \subsubsection{Cloud}
 
             \paragraph{}
-            On the cloud, two virtual machines are required to run IMB PingPong. The main VM (where the job is initialised from) must have at least two cores. This allows running the benchmark between two VMs and on just the main VM without re-installation.
+            Two virtual machines are required to run IMB PingPong. The main VM (where the job is initialised from) must have at least two cores. This allows running the benchmark between two VMs and on just the main VM without re-installation.
 
             \paragraph{}
             Using \url{http://mimic.gridpp.rl.ac.uk/}, under the \verb|Cloud -> Open Nebula| section, find the VMs and ensure that they are on different hypervisors (by clicking for more information).
 
             \begin{enumerate}
-                \item Install IMB PingPong in the home directory of both VMs and setup SSH as explained previously in section \ref{cloud-installation}
-                \item Create a top directory on the main VM eg \verb|/home/tan49775/Cloud_IMB|
-                \item Create a script (\verb|run_IMB_Cloud.sh|) in this top directory which will run a repeat of the benchmark each time it is called, incrementing a count file to keep track of the number of repeats. The script ensures the benchmark is run 30 times within the same host and then 30 times between the two VMs. There is no 'exclusive' on the cloud so the average over a larger number of repeats ensures a better representation of typical use. Use a different \verb|HOME_DIR|, \verb|START_DIR| and host addresses.
+                \item Install IMB PingPong in the home directory of both VMs and setup SSH as in section \ref{cloud-installation}.
+                \item Create a top directory on the main VM eg \verb|/home/tan49775/Cloud_IMB|.
+                \item Create a script (Code \ref{code:tests-cloud_imb-runimbcloud-sh}) in this top directory which will run a repeat of the benchmark each time it is called, incrementing a count file to keep track of the number of repeats. The script ensures the benchmark is run 30 times within the same host and then 30 times between the two VMs. There is no 'exclusive' on the cloud so the average over a larger number of repeats ensures a better representation of typical use. Use a different \verb|HOME_DIR|, \verb|START_DIR| and host addresses.
+                    \begin{code}
+                    \captionof{listing}{The script to run IMB once on each call over cron}
+                    \label{code:tests-cloud_imb-runimbcloud-sh}
                     \begin{minted}[breaklines=true]{bash}
 #! /bin/bash
 
@@ -284,20 +314,155 @@ mpirun -np 2 $multiHostFlags $HOME_DIR/imb/imb/src/IMB-MPI1 -iter 1000 -msglog 0
 # Increment the count file
 echo $(($(cat $COUNT) + 1)) > $COUNT
                     \end{minted}
-                \item Make the script executable \mintinline{bash}{chmod 755 run_IMB_Cloud.sh}
-                \item Setup a crontab to run the script at 20 minute intervals. Avoid using standard times (00, 30) etc to reduce the chance that another VM on the same hypervisor is running an interfering cronjob at the same time.
+                    \end{code}
+                \item Make the script executable using \mintinline{bash}{chmod 755 run_IMB_Cloud.sh}.
+                \item Setup a crontab to run the script at 20 minute intervals.
+
                     \begin{minted}{bash}
 05,25,45 * * * * /home/tan49775/Cloud_IMB/run_IMB_Cloud.sh
                     \end{minted}
                 \item Again, similar output files are produced.
             \end{enumerate}
-        \subsubsection{Interpreting IMB PingPong results}
-        The standard output from
-    \subsection{Configuring HPL}
+        \subsubsection{Interpreting Results}
+            \paragraph{}
+            The standard output from IMB PingPong is shown in Appendix \ref{appendix:imb-example-output}. As explained in Section \ref{overview-of-methods}, latency is recorded from the first entry in the \verb|t[usec]| column - where the message size is zero. Bandwidth is recorded from the \verb|Mbytes/sec| column. Different message sizes are of interest.
+            TODO: NEATEN THIS UP
+
+
+
+
 
     \subsection{Running HPL}
-        \subsubsection{SCARF} \label{running-HPL-SCARF}
-        TODO: Something here about copying in SCARF10 binary
+        \paragraph{}
+        Similarly to running IMB, shell scripts are used with cron or LSF for each setup to submit the necessary repeats and apply platform parameters. In the case of HPL, a configuration file is supplied.
+
+        \subsubsection{Configuration}
+            \paragraph{}
+            HPL uses a configuration file to specify the problem size and the computational parameters (how to split the matrix and what functions to use). On execution, it looks in the working directory and reads from \verb|HPL.dat|. The full file used is included in Appendix \ref{appendix:hpl-conf}.
+
+
+            \paragraph{}
+            The first parameter to choose is the number of cores to use when running the benchmark. The same number should be chosen for LOTUS, SCARF and the Cloud to allow comparison. Given that the Cloud has a limit of 5 cores per user (split across as many VMs) that specifies an upper bound. The parameters \verb|P| and \verb|Q| should be approximately equal and \verb|P| multiplied by \verb|Q| is the number of processors. In order to avoid \verb|P| or \verb|Q| being 1, 2 was chosen for both values giving a total of 4 cores. In order to balance these across hosts, measurements were taken with four cores from the same node and with two cores on each node.
+
+            \paragraph{}
+            Some initial tests were done across the infrastructures to choose a value of \verb|NB| (the block size) that was reasonably well performing with respect to other values in the default interval [32, 256]. However, care was taken to avoid tuning this value to a particular system and these initial test were only to confirm that it was not a radically poor choice for any setup. The value 180 was decided on.
+
+            \paragraph{}
+            The main parameter is 'problem size' (\verb|N|)  which is the side length of the matrix to be solved. According to \cite{hpl2016}, the largest size that will fit in memory is recommended. The Cloud limits users to 20GB of memory so this was used as an upper bound. Each element in the matrix is a double precision float (8 bytes). This means that a total of $2.5 \times 10 ^ 9$ elements can be used. Using the recommend 80\% figure (to leave room for the OS), this gives a side length of around 44721. It is also beneficial to have a multiple of NB so 44640 was chosen.
+
+            \paragraph{}
+            Provided the same file is used for each test, to an extent, the content of this file is insignificant - it will still provide a comparison of parallel application performance. Where possible, advice provided in the "FAQ" and "tuning" sections of \cite{hpl2016} was followed, using default or suggested values if provided to attempt to remain neutral. Of course, it would be possible to tune this configuration file for each setup and achieve some faster speeds but this would likely be at the expense of other setups and introduce a bias. Any case where there was no default value given is justified above.
+
+
+
+        \subsubsection{SCARF}
+        \label{running-HPL-SCARF}
+        \begin{enumerate}
+            \item Create a top directory (e.g. \verb|/home/cseg/scarf656/SCARF_HPL|) and \verb|cd| into it.
+            \item Run \mintinline{bash}{bsub -m scarf10 "cp /apps/procspec/hpl/2.2/bin/Linux_Intel64/xhpl ."} to copy the SCARF10 precompiled HPL binary into this directory.
+            \item Copy in \verb|HPL.dat| from the Appendix \ref{appendix:hpl-conf}.
+            \item Submit jobs to run the benchmark for five repeats across each host group. For each host group, run the benchmark between two hosts using TCP and using Infiniband; and on the same host. Use Code \ref{code:tests-scarf_hpl-runhplscarf-sh} from inside the top directory.
+
+
+            \begin{code}
+            \captionof{listing}{Submitting HPL to SCARF}
+            \label{code:tests-scarf_hpl-runhplscarf-sh}
+
+            \begin{minted}{bash}
+#! /bin/bash
+hostgroups=(scarf10 scarf11 scarf12 scarf13 scarf14 scarf15 scarf16)
+# Make the outputs directory if it doesn't exist
+mkdir -p $PWD/outputs
+for specificHost in ${hostgroups[@]}; do # For each hostgroup
+    for perTile in 2 4; do # Span one node or two
+        if [ $perTile -eq 2 ]; then
+            # If going between nodes, specify different interconnect flags
+            pFlagOptions=(-TCP -IBV)
+        else
+            # If not, there are no interconnect flags
+            pFlagOptions=("")
+        fi
+	    for pFlag in "${pFlagOptions[@]}"; do # Step through interconnect flags
+            for repeat in 1 2 3 4 5; do # repeat the benchmark
+
+bsub << %EndOfInput%
+#BSUB -x
+#BSUB -n 4
+#BSUB -R "span[ptile=$perTile]"
+#BSUB -J HPL
+#BSUB -o $PWD/outputs/%J.out
+#BSUB -e $PWD/outputs/%J.err
+#BSUB -W 1:00
+#BSUB -m "$specificHost"
+module load intel/15.3
+module load intel/mkl/11.3.1.150
+mpirun -lsf -prot $pFlag $PWD/xhpl
+%EndOfInput%
+
+            done
+        done
+    done
+done
+            \end{minted}
+            \end{code}
+            \item Output and error files are placed into a sub-directory \verb|outputs| for analysis.
+        \end{enumerate}
+
+
+        \subsubsection{LOTUS}
+
+        \paragraph{}
+        HPL requires a linear algebra library to run. On SCARF and LOTUS, this in Intel's MKL. The environment for this is set up using the \mintinline{bash}{module load} command and on SCARF, this is passed to the other process using system daemons. On LOTUS, MPI is configured to run over SSH meaning that each new process has a different environment. For this reason, it is necessary to pass the \verb|LD_LIBRARY_PATH| environment variable in the \mintinline{bash}{mpirun.lotus} command (see Code \ref{code:tests-jasmin_hpl-runhpljasmin-sh}).
+
+        \begin{enumerate}
+
+            \item Create a top directory (e.g. \verb|/home/users/ciddon/JASMIN_HPL|) and \verb|cd| into it.
+
+            \item Copy in \verb|HPL.dat| from the Appendix \ref{appendix:hpl-conf}.
+
+            \item Submit jobs to run the benchmark for five repeats across each host group. For each host group, run the benchmark between two hosts and on the same host. Use Code \ref{code:tests-jasmin_hpl-runhpljasmin-sh} from inside the top directory.
+
+            \begin{code}
+            \captionof{listing}{Submitting HPL to LOTUS}
+            \label{code:tests-jasmin_hpl-runhpljasmin-sh}
+
+            \begin{minted}[breaklines=true]{bash}
+#! /bin/bash
+hostgroups=(ivybridge512G ivybridge2000G haswell256G ivybridge128G broadwell256G)
+# Make the outputs directory if it doesn't exist
+mkdir -p $PWD/outputs
+for specificHost in ${hostgroups[@]}; do # For each hostgroup
+    for perTile in 2 4; do # Span one (4) or two (2) nodes
+        for repeat in 1 2 3 4 5; do # Repeat the benchmark
+
+bsub << %EndOfInput%
+#BSUB -x
+#BSUB -q par-multi
+#BSUB -n 4
+#BSUB -R "span[ptile=$perTile]"
+#BSUB -J HPL
+#BSUB -o $PWD/outputs/%J.out
+#BSUB -e $PWD/outputs/%J.err
+#BSUB -W 1:00
+#BSUB -m "$specificHost"
+. /etc/profile.modules
+module load intel/15.1
+module load intel/mkl/11.3.1.150
+mpirun.lotus -e LD_LIBRARY_PATH=\$LD_LIBRARY_PATH -prot /apps/src/hpl/hpl-2.2/bin/Linux_Intel64/xhpl
+%EndOfInput%
+
+        done
+    done
+done
+            \end{minted}
+            \end{code}
+            \item Output and error files are placed into a sub-directory \verb|outputs| for analysis.
+        \end{enumerate}
+
+
+
+        \subsubsection{Cloud}
+
 
 \section{Results}
 
@@ -313,7 +478,11 @@ echo $(($(cat $COUNT) + 1)) > $COUNT
 
 \appendix
     \section{HPL SL6 Makefile}
+    \label{appendix:makefile}
     This make file is used to link the HPL binary to the libraries it requires. The comments are removed for clarity but the format follows the example in the \verb|hpl-2.2.tar| archive \verb|hpl-2.2/setup/Make.Linux_Intel64|. It should be saved as \verb|hpl-2.2/Make.Linux_SL6_Intel64|.
+        \begin{code}
+        \captionof{listing}{The HPL SL6 Makefile}
+        \label{code:builds-cloud-make-linux_sl6_intel64}
         \begin{minted}{make}
 SHELL        = /bin/sh
 CD           = cd
@@ -347,6 +516,86 @@ LINKFLAGS    = $(CCFLAGS) $(OMP_DEFS) -mt_mpi
 ARCHIVER     = ar
 ARFLAGS      = r
 RANLIB       = echo
+
+        \end{minted}
+        \end{code}
+
+    \section{IMB Example Output}
+        \label{appendix:imb-example-output}
+        The following is a section of the output from the IMB PingPong benchmark. The general information (e.g. start time) has been removed
+        from the header, leaving just the output.
+        \begin{minted}{text}
+#---------------------------------------------------
+# Benchmarking PingPong
+# #processes = 2
+#---------------------------------------------------
+       #bytes #repetitions      t[usec]   Mbytes/sec
+            0         1000         0.24         0.00
+            1         1000         0.31         3.03
+            2         1000         0.33         5.73
+            4         1000         0.32        12.02
+            8         1000         0.33        23.29
+           16         1000         0.36        42.87
+           32         1000         0.32        95.24
+           64         1000         0.34       177.65
+          128         1000         0.38       322.93
+          256         1000         0.47       524.46
+          512         1000         0.57       853.69
+         1024         1000         0.73      1334.20
+         2048         1000         1.02      1916.71
+         4096         1000         2.00      1957.00
+         8192         1000         2.97      2629.12
+        16384         1000         5.06      3086.37
+        32768         1000         8.39      3723.58
+        65536         1000        13.45      4648.40
+       131072         1000        23.42      5338.11
+       262144         1000        40.61      6155.58
+       524288         1000        72.47      6899.88
+      1048576         1000       134.10      7456.95
+      2097152         1000       262.16      7628.87
+      4194304         1000       614.76      6506.58
+      8388608         1000      1714.74      4665.43
+     16777216         1000      3617.98      4422.35
+        \end{minted}
+
+    \section{HPL Configuration File}
+        \label{appendix:hpl-conf}
+
+        \paragraph{}
+        The configuration file that was used with every HPL test is given below.
+
+        \begin{minted}{text}
+The HPL Configuration File for comparing LOTUS, SCARF
+and the Cloud in SCD.
+not_used     output file name (if any)
+6            device out (6=stdout,7=stderr,file)
+1            # of problems sizes (N)
+44640        Ns
+1            # of NBs
+180          NBs
+0            PMAP process mapping (0=Row-,1=Column-major)
+1            # of process grids (P x Q)
+2            Ps
+2            Qs
+16.0         threshold
+1            # of panel fact
+1            PFACTs (0=left, 1=Crout, 2=Right)
+1            # of recursive stopping criterium
+4            NBMINs (>= 1)
+1            # of panels in recursion
+2            NDIVs
+1            # of recursive panel fact.
+2            RFACTs (0=left, 1=Crout, 2=Right)
+1            # of broadcast
+1            BCASTs (0=1rg,1=1rM,2=2rg,3=2rM,4=Lng,5=LnM)
+1            # of lookahead depth
+1            DEPTHs (>=0)
+2            SWAP (0=bin-exch,1=long,2=mix)
+180          swapping threshold
+0            L1 in (0=transposed,1=no-transposed) form
+0            U  in (0=transposed,1=no-transposed) form
+1            Equilibration (0=no,1=yes)
+8            memory alignment in double (> 0)
 
         \end{minted}
 
