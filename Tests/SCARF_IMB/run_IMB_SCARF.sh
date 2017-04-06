@@ -3,7 +3,7 @@ hostgroups=(scarf10 scarf11 scarf12 scarf13 scarf14 scarf15 scarf16)
 # Make the outputs directory if it doesn't exist
 mkdir -p $PWD/outputs
 for specificHost in ${hostgroups[@]}; do # For each hostgroup
-    for perTile in 1 2; do # Span one node or two
+    for perTile in 1 2; do # Span one (2) node or two (1)
         if [ $perTile -eq 1 ]; then
             # If going between nodes, specify different interconnect flags
             pFlagOptions=(-TCP -IBV)
