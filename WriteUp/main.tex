@@ -1,0 +1,353 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+% for large margins
+\usepackage[margin=1in]{geometry}
+% for \verb
+\usepackage{verbatim}
+% for \verb inside lists
+\usepackage[Q=yes]{examplep}
+
+% fonts to remove the tilde
+\usepackage[T1]{fontenc}
+% \usepackage{beramono}
+
+% to format the code
+\usepackage[newfloat]{minted}
+\usemintedstyle{borland}
+% for code captioning
+\usepackage{caption}
+
+\newenvironment{code}{\captionsetup{type=listing}}{}
+\SetupFloatingEnvironment{listing}{name=Code}
+
+
+% to link to mimic
+\usepackage{hyperref}
+
+
+% bibliography
+\usepackage[
+backend=biber,
+style=alphabetic,
+sorting=ynt
+]{biblatex}
+\addbibresource{bib.bib}
+
+
+
+
+\title{Benchmarking Parallel Application Performance Across SCD Infrastructure}
+\author{Callum Iddon }
+\date{March 2017}
+
+\begin{document}
+
+\definecolor{code-bg}{rgb}{0.95,0.95,0.95}
+\setminted{bgcolor=code-bg}
+
+\maketitle
+\tableofcontents
+
+\section{Introduction}
+
+    \subsection{Background}
+        \paragraph{}
+        The Scientific Computing Department (SCD) provides a number of compute resources. Across the different infrastructures, the varying CPUs, interconnect bandwidth and latencies have an unquantified effect on parallel applications. Also un-measured is the effect of choices within each service, such as using newer hardware or distributing cores between nodes.
+
+    \subsection{In this project}
+        \paragraph{}
+        Comparison metrics are gathered for parallel application performance across three SCD services - SCARF, LOTUS and the SCD Cloud. The aim is to provide results that can inform deployment decisions for parallel applications using the message passing interface (MPI) libraries going forward.
+
+        \paragraph{}
+        Two specific metrics are recorded - bandwidth and latency - using the IMB PingPong benchmark. Application performance is then measured more generally according to the results from the HPL TOP500 test. On SCARF and LOTUS, these are taken on cores on the same node, spanning different nodes, and on different hardware versions. On the Cloud, they are taken from one VM and across two VMs (on different hypervisors).
+
+\section{Methods}
+
+    \subsection{Overview}
+    There are two benchmarking applications to run on each system.
+
+    \begin{description}
+        \item[IMB PingPong] uses MPI to send messages of increasing size both ways between two processes \cite{intel2016}. Latency can be recorded as the average time for the message of zero size to cross one way between the two processes. Bandwidth can be recorded as the rate of throughput at different message sizes. The only dependency to run this benchmark is an MPI library.
+        \item[HPL TOP500] solves a large matrix problem over distributed compute and memory resources \cite{hpl2016}. The time taken to solve the problem gives a measure of parallel application performance in flops (floating point operations per second). The software relies on a linear algebra library as well as an MPI library.
+    \end{description}
+
+    \subsection{Installation} \label{installation}
+
+        \paragraph{}
+        On the Cloud, the benchmarks need to be installed from scratch, alongside any dependencies. On SCARF and LOTUS, the MPI and linear algebra libraries are pre installed alongside HPL but IMB must be compiled from source and linked to the existing MPI libraries.
+
+        \subsubsection{Cloud} \label{cloud-installation}
+
+        \paragraph{}
+        An SL6 no GUI virtual machine was used. The MPI library was OpenMPI and the linear algebra library was OpenBLAS (both from yum). A makefile was created to link to these libraries which is included in the appendices.
+
+            \begin{code}
+            \captionof{listing}{Installing IMB and HPL on a Cloud VM}
+            \label{code:builds-cloud-build-sh}
+            \begin{minted}{bash}
+# Install IMB PingPong
+sudo yum -y install openmpi-devel  # install OpenMPI
+wget https://software.intel.com/sites/default/files/managed/a3/53/IMB_2017.tgz
+tar -xvf IMB_2017.tgz
+source /etc/profile.d/modules.sh   # enable environment-modules
+module load openmpi-1.10-x86_64    # load the MPI module
+cd imb/imb/src
+make all CC=mpicc                  # compile
+cd -
+
+# Install HPL
+wget http://www.netlib.org/benchmark/hpl/hpl-2.2.tar.gz
+tar -xvf hpl-2.2.tar.gz
+sudo yum -y install openblas-devel openblas-static # install OpenBLAS
+cd hpl-2.2/
+# Copy in the makefile from the appendix now.
+make arch=Linux_SL6_Intel64                        # compile
+            \end{minted}
+            \end{code}
+
+
+        To run MPI between VMs on the Cloud (without a scheduler), SSH keys must be set up. There is no need for encryption provided the keys never leave either machine.
+            \begin{code}
+            \captionof{listing}{Setting up SSH keys between
+            Cloud VMs}
+            \label{code:builds-cloud-setupssh-sh}
+            \begin{minted}{bash}
+# On both VMs
+sudo chown $USER:root ~/.ssh # Cloud VMs start with root:root, allow yourself access
+
+# On one
+ssh-keygen -t rsa # create key pair
+cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys # allow access to key
+scp ~/.ssh/* <other VM hostname>:~/.ssh/ # copy this setup to the other machine
+            \end{minted}
+            \end{code}
+
+        \subsubsection{SCARF and LOTUS}
+        On both LOTUS and SCARF, the IMB PingPong benchmark was compiled from source.
+
+            \begin{code}
+            \captionof{listing}{Installing IMB on SCARF and LOTUS}
+            \label{code:builds-jasmin_scarf-buildimb-sh}
+            \begin{minted}{bash}
+# Install IMB PingPong
+wget https://software.intel.com/sites/default/files/managed/a3/53/IMB_2017.tgz
+tar -xvf IMB_2017.tgz
+cd imb/imb/src
+gmake all CC=mpicc
+            \end{minted}
+            \end{code}
+
+
+        On LOTUS, the HPL binary is located at \verb|/apps/src/hpl/hpl-2.2/bin/Linux_Intel64/xhpl| which is installed using the Intel MKL and Platform MPI libraries.
+
+        On SCARF, HPL is optimised for each processor at \verb|/apps/procspec/hpl/2.2/bin/Linux_Intel64/xhpl|, to avoid this optimisation advantage, the SCARF10 (least optimised) version was used for all processors by copying this binary to a shared location between processors (see section \ref{running-HPL-SCARF}).
+
+    \subsection{Running IMB PingPong}
+
+    \paragraph{}
+    Using the LSF scheduler on LOTUS and SCARF, benchmarks are submitted as jobs using shell scripts that start by specifying parameters. On the Cloud, a cronjob wraps running the benchmark by choosing whether to run on just one VM or two VMs based on the number of repeats so far.
+
+        \subsubsection{SCARF}
+            \begin{enumerate}
+                \item Create a top directory and \verb|cd| into it (e.g. \verb|/home/cseg/scarf565/SCARF_IMB|)
+                \item Install IMB PingPong inside this directory as explained previously (Code \ref{code:builds-cloud-build-sh}). This should create \verb|imb/imb/src/IMB-MPI1|.
+                \item Submit jobs to run the benchmark for 5 repeats across each host group. For each host group, run the benchmark between hosts using TCP, using Infiniband and on the same host
+                    \begin{code}
+                    \captionof{listing}{Submitting IMB Benchmarks to SCARF}
+                    \label{code:tests-scarf_imb-runimbfromscarf-sh}
+                    \begin{minted}[breaklines=true]{bash}
+#! /bin/bash
+hostgroups=(scarf10 scarf11 scarf12 scarf13 scarf14 scarf15 scarf16)
+# Make the outputs directory if it doesn't exist
+mkdir -p $PWD/outputs
+for specificHost in ${hostgroups[@]}; do # For each hostgroup
+    for perTile in 1 2; do # Span one node or two
+        if [ $perTile -eq 1 ]; then
+            # If going between nodes, specify different interconnect flags
+            pFlagOptions=(-TCP -IBV)
+        else
+            # If not, there are no interconnect flags
+            pFlagOptions=("")
+        fi
+        for pFlag in "${pFlagOptions[@]}"; do # Step through interconnect flags
+            for repeat in 1 2 3 4 5; do # Repeat the benchmark
+
+bsub << %EndOfInput%
+#BSUB -x
+#BSUB -n 2
+#BSUB -R "span[ptile=$perTile]"
+#BSUB -J PingPong
+#BSUB -o $PWD/outputs/%J.out
+#BSUB -e $PWD/outputs/%J.err
+#BSUB -W 0:45
+#BSUB -m "$specificHost"
+mpirun -lsf -prot $pFlag $PWD/imb/imb/src/IMB-MPI1 -iter 1000 -time 200 -msglog 0:24 -iter_policy off PingPong
+%EndOfInput%
+
+            done
+        done
+    done
+done
+
+                \end{minted}
+                \end{code}
+                \item This will create \verb|.err| and \verb|.out| files for each run of the benchmark under a directory \verb|outputs/|
+            \end{enumerate}
+        \subsubsection{LOTUS}
+            The method for running IMB PingPong on LOTUS is similar but there is no Infiniband available and there is a different \verb|mpirun| command.
+
+            \begin{enumerate}
+                \item Create a top directory and \verb|cd| into it (e.g. \verb|/home/users/ciddon/JASMIN_IMB|)
+                \item Install IMB PingPong inside this directory as explained previously (Code \ref{code:builds-cloud-build-sh}). This should create \verb|imb/imb/src/IMB-MPI1|.
+                \item Submit jobs to run the benchmark for 5 repeats across each host group. For each host group, run the benchmark between hosts and within the same host.
+                    \begin{minted}[breaklines=true]{bash}
+#! /bin/bash
+hostgroups=(ivybridge512G ivybridge2000G haswell256G ivybridge128G broadwell256G)
+# Make the outputs directory if it doesn't exist
+mkdir -p $PWD/outputs
+for specificHost in ${hostgroups[@]}; do # For each hostgroup
+    for perTile in 1 2; do # Span one or two nodes
+        for repeat in 1 2 3 4 5; do # Repeat the benchmark
+
+bsub << %EndOfInput%
+#BSUB -x
+#BSUB -q par-multi
+#BSUB -n 2
+#BSUB -R "span[ptile=$perTile]"
+#BSUB -J PingPong
+#BSUB -o $PWD/outputs/%J.out
+#BSUB -e $PWD/outputs/%J.err
+#BSUB -W 0:45
+#BSUB -m "$specificHost"
+mpirun.lotus -prot $PWD/imb/imb/src/IMB-MPI1 -iter 1000 -time 200 -msglog 0:24 -iter_policy off PingPong
+%EndOfInput%
+
+        done
+    done
+done
+                    \end{minted}
+                \item This creates the same \verb|.out| and \verb|.err| files as above.
+            \end{enumerate}
+        \subsubsection{Cloud}
+
+            \paragraph{}
+            On the cloud, two virtual machines are required to run IMB PingPong. The main VM (where the job is initialised from) must have at least two cores. This allows running the benchmark between two VMs and on just the main VM without re-installation.
+
+            \paragraph{}
+            Using \url{http://mimic.gridpp.rl.ac.uk/}, under the \verb|Cloud -> Open Nebula| section, find the VMs and ensure that they are on different hypervisors (by clicking for more information).
+
+            \begin{enumerate}
+                \item Install IMB PingPong in the home directory of both VMs and setup SSH as explained previously in section \ref{cloud-installation}
+                \item Create a top directory on the main VM eg \verb|/home/tan49775/Cloud_IMB|
+                \item Create a script (\verb|run_IMB_Cloud.sh|) in this top directory which will run a repeat of the benchmark each time it is called, incrementing a count file to keep track of the number of repeats. The script ensures the benchmark is run 30 times within the same host and then 30 times between the two VMs. There is no 'exclusive' on the cloud so the average over a larger number of repeats ensures a better representation of typical use. Use a different \verb|HOME_DIR|, \verb|START_DIR| and host addresses.
+                    \begin{minted}[breaklines=true]{bash}
+#! /bin/bash
+
+# Enable the module command
+source /etc/profile.d/modules.sh
+# Use the module command to set the mpi env
+module load openmpi-1.10-x86_64
+
+# Set up some variables
+REPEATS_FOR_EACH=30
+# Set HOME_DIR and START_DIR to the top directory
+HOME_DIR=/home/tan49775  # should contain imb/imb/src.. and Cloud_IMB
+START_DIR=$HOME_DIR/Cloud_IMB
+COUNT=$START_DIR/count
+
+# Make the output directory if needed
+mkdir -p $START_DIR/outputs
+
+num=$(date +"%Y%m%d_%H%M%S")
+outputFile=$START_DIR/outputs/$num.out
+errorFile=$START_DIR/outputs/$num.err
+
+# If the count file does not exist then initialise it
+if [ ! -s $COUNT ]; then echo "1" > $COUNT; fi
+
+# If done enough repeats of one host and two hosts then exit
+if [ $(cat $COUNT) -gt $((2 * $REPEATS_FOR_EACH)) ]; then exit 0; fi
+
+# If done enough repeats for one host then use two hosts
+if [ $(cat $COUNT) -gt $REPEATS_FOR_EACH ]; then
+    echo "#HOSTS=2" > $outputFile
+    # Edit the two host addresses here as necessary
+    multiHostFlags="--prefix /usr/lib64/openmpi-1.10/ --map-by node  --rank-by node --host vm275.nubes.stfc.ac.uk,vm15.nubes.stfc.ac.uk"
+else # Otherwise only use this host
+    echo "#HOSTS=1" > $outputFile
+    multiHostFlags=""
+fi
+
+# Run the benchmark
+mpirun -np 2 $multiHostFlags $HOME_DIR/imb/imb/src/IMB-MPI1 -iter 1000 -msglog 0:24 -iter_policy off -time 200 PingPong 2> $errorFile >> $outputFile
+
+# Increment the count file
+echo $(($(cat $COUNT) + 1)) > $COUNT
+                    \end{minted}
+                \item Make the script executable \mintinline{bash}{chmod 755 run_IMB_Cloud.sh}
+                \item Setup a crontab to run the script at 20 minute intervals. Avoid using standard times (00, 30) etc to reduce the chance that another VM on the same hypervisor is running an interfering cronjob at the same time.
+                    \begin{minted}{bash}
+05,25,45 * * * * /home/tan49775/Cloud_IMB/run_IMB_Cloud.sh
+                    \end{minted}
+                \item Again, similar output files are produced.
+            \end{enumerate}
+        \subsubsection{Interpreting IMB PingPong results}
+        The standard output from
+    \subsection{Configuring HPL}
+
+    \subsection{Running HPL}
+        \subsubsection{SCARF} \label{running-HPL-SCARF}
+        TODO: Something here about copying in SCARF10 binary
+
+\section{Results}
+
+    \subsection{IMB PingPong}
+
+    \subsection{HPL}
+
+\section{Evaluation}
+
+\section{Conclusion}
+
+\printbibliography[title={Sources}]
+
+\appendix
+    \section{HPL SL6 Makefile}
+    This make file is used to link the HPL binary to the libraries it requires. The comments are removed for clarity but the format follows the example in the \verb|hpl-2.2.tar| archive \verb|hpl-2.2/setup/Make.Linux_Intel64|. It should be saved as \verb|hpl-2.2/Make.Linux_SL6_Intel64|.
+        \begin{minted}{make}
+SHELL        = /bin/sh
+CD           = cd
+CP           = cp
+LN_S         = ln -fs
+MKDIR        = mkdir -p
+RM           = /bin/rm -f
+TOUCH        = touch
+ARCH         = Linux_SL6_Intel64
+TOPdir       = $(HOME)/hpl-2.2
+INCdir       = $(TOPdir)/include
+BINdir       = $(TOPdir)/bin/$(ARCH)
+LIBdir       = $(TOPdir)/lib/$(ARCH)
+HPLlib       = $(LIBdir)/libhpl.a
+MPdir        = /usr
+MPinc        = -I$(MPdir)/include/openmpi-1.10-x86_64
+MPlib        = $(MPdir)/lib64/openmpi-1.10/lib/libmpi.so
+LAinc        =  /usr/include/openblas/
+LAlib        =  /usr/lib64/libopenblas.so
+F2CDEFS      = -DAdd__ -DF77_INTEGER=int -DStringSunStyle
+HPL_INCLUDES = -I$(INCdir) -I$(INCdir)/$(ARCH) -I$(LAinc) $(MPinc)
+HPL_LIBS     = $(HPLlib) $(LAlib) $(MPlib)
+HPL_OPTS     = -DHPL_DETAILED_TIMING -DHPL_PROGRESS_REPORT
+HPL_DEFS     = $(F2CDEFS) $(HPL_OPTS) $(HPL_INCLUDES)
+CC           = mpicc
+CCNOOPT      = $(HPL_DEFS)
+OMP_DEFS     = -openmp
+CCFLAGS      = $(HPL_DEFS) -O3 -w -z noexecstack -z relro -z now -Wall
+LINKER       = $(CC)
+LINKFLAGS    = $(CCFLAGS) $(OMP_DEFS) -mt_mpi
+ARCHIVER     = ar
+ARFLAGS      = r
+RANLIB       = echo
+
+        \end{minted}
+
+\end{document}
