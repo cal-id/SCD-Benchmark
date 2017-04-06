@@ -3,7 +3,7 @@ hostgroups=(ivybridge512G ivybridge2000G haswell256G ivybridge128G broadwell256G
 # Make the outputs directory if it doesn't exist
 mkdir -p $PWD/outputs
 for specificHost in ${hostgroups[@]}; do # For each hostgroup
-    for perTile in 1 2; do # Span one or two nodes
+    for perTile in 1 2; do # Span one (2) or two (2) nodes
         for repeat in 1 2 3 4 5; do # Repeat the benchmark
 
 bsub << %EndOfInput%
