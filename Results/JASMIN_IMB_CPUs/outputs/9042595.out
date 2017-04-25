@@ -1,0 +1,132 @@
+Sender: LSF System <lsfadmin@host291.jc.rl.ac.uk>
+Subject: Job 9042595: <PingPong> in cluster <lotus> Done
+
+Job <PingPong> was submitted from host <lotus.jc.rl.ac.uk> by user <ciddon> in cluster <lotus> at Tue Apr 25 08:54:52 2017.
+Job was executed on host(s) <2*host291.jc.rl.ac.uk>, in queue <par-multi>, as user <ciddon> in cluster <lotus> at Tue Apr 25 08:56:30 2017.
+</home/users/ciddon> was used as the home directory.
+</home/users/ciddon/JASMIN_IMB_CPUs> was used as the working directory.
+Started at Tue Apr 25 08:56:30 2017.
+Terminated at Tue Apr 25 08:57:46 2017.
+Results reported at Tue Apr 25 08:57:46 2017.
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+#BSUB -x
+#BSUB -q par-multi
+#BSUB -n 2
+#BSUB -R "span[ptile=2] select[type==any]"
+#BSUB -J PingPong
+#BSUB -o /home/users/ciddon/JASMIN_IMB_CPUs/outputs/%J.out
+#BSUB -e /home/users/ciddon/JASMIN_IMB_CPUs/outputs/%J.err
+#BSUB -W 0:02
+#BSUB -m "ivybridge2000G"
+mpirun.lotus -prot numactl --cpunodebind=0 -- /home/users/ciddon/JASMIN_IMB_CPUs/imb/imb/src/IMB-MPI1 -iter 1000 -time 200 -msglog 0:24 -iter_policy off PingPong
+
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   150.16 sec.
+    Max Memory :                                 91.27 MB
+    Average Memory :                             51.46 MB
+    Total Requested Memory :                     -
+    Delta Memory :                               -
+    Max Swap :                                   8700 MB
+    Max Processes :                              9
+    Max Threads :                                11
+    Run time :                                   76 sec.
+    Turnaround time :                            174 sec.
+
+The output (if any) follows:
+
+Parsing application description...
+Identifying hosts...
+Spawning processes...
+Process layout for world 0 is as follows:
+mpirun:  proc 4538
+  daemon proc 4541 on host 192.168.120.191
+    rank 0:  proc 4545
+    rank 1:  proc 4546
+Host 0 -- ip 192.168.120.191 -- ranks 0 - 1
+
+ host | 0
+======|======
+    0 : SHM
+
+ Prot -  All Intra-node communication is: SHM
+
+#------------------------------------------------------------
+#    Intel (R) MPI Benchmarks 2017, MPI-1 part    
+#------------------------------------------------------------
+# Date                  : Tue Apr 25 08:56:31 2017
+# Machine               : x86_64
+# System                : Linux
+# Release               : 2.6.32-642.6.2.el6.x86_64
+# Version               : #1 SMP Mon Oct 24 10:22:33 EDT 2016
+# MPI Version           : 2.2
+# MPI Thread Environment: 
+
+
+# Calling sequence was: 
+
+# /home/users/ciddon/JASMIN_IMB_CPUs/imb/imb/src/IMB-MPI1 -iter 1000 -time 200 -msglog 0:24
+#                                                         -iter_policy off PingPong
+
+# Minimum message length in bytes:   0
+# Maximum message length in bytes:   16777216
+#
+# MPI_Datatype                   :   MPI_BYTE 
+# MPI_Datatype for reductions    :   MPI_FLOAT
+# MPI_Op                         :   MPI_SUM  
+#
+#
+
+# List of Benchmarks to run:
+
+# PingPong
+
+#---------------------------------------------------
+# Benchmarking PingPong 
+# #processes = 2 
+#---------------------------------------------------
+       #bytes #repetitions      t[usec]   Mbytes/sec
+            0         1000         0.17         0.00
+            1         1000         0.22         4.33
+            2         1000         0.17        11.09
+            4         1000         0.17        22.24
+            8         1000         0.17        44.48
+           16         1000         0.18        84.99
+           32         1000         0.17       176.92
+           64         1000         0.25       241.17
+          128         1000         0.34       362.86
+          256         1000         0.34       720.11
+          512         1000         0.40      1217.96
+         1024         1000         0.57      1719.20
+         2048         1000         0.92      2117.07
+         4096         1000         1.33      2933.83
+         8192         1000         2.24      3482.25
+        16384         1000         4.08      3832.85
+        32768         1000         5.70      5486.25
+        65536         1000         9.75      6413.54
+       131072         1000        17.63      7091.39
+       262144         1000        33.58      7446.00
+       524288         1000        65.83      7594.98
+      1048576         1000       129.69      7710.55
+      2097152         1000       256.20      7806.40
+      4194304         1000       585.85      6827.65
+      8388608         1000      6681.81      1197.28
+     16777216         1000     10779.06      1484.36
+
+
+# All processes entering MPI_Finalize
+
+
+
+PS:
+
+Read file </home/users/ciddon/JASMIN_IMB_CPUs/outputs/9042595.err> for stderr output of this job.
+
