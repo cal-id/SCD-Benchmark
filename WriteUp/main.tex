@@ -23,9 +23,14 @@
 % for code captioning
 \usepackage{caption}
 
+% for table
+\usepackage{multirow}
+
 \newenvironment{code}{\captionsetup{type=listing}}{}
 \SetupFloatingEnvironment{listing}{name=Code}
 
+
+%TODO: CHECK FIGURE ORDERING IF SOME ARE FLOATS!%
 
 % to link to mimic
 \usepackage{hyperref}
@@ -34,6 +39,9 @@
 \usepackage{graphicx}
 \graphicspath{ {images/} }
 \usepackage{subcaption}
+
+% for landscape
+\usepackage{pdflscape}
 
 
 % bibliography
@@ -91,6 +99,9 @@ This is the abstract which is definitely TODO!
         \item[IMB PingPong] uses MPI to send messages of increasing size both ways between two processes \cite{intel2016}. Latency can be recorded as the average time for the message of zero size to cross one way between the two processes. Bandwidth can be recorded as the rate of throughput at different message sizes. The only dependency to run this benchmark is an MPI library.
         \item[HPL TOP500] solves a large matrix problem over distributed compute and memory resources \cite{hpl2016}. The time taken to solve the problem gives a measure of parallel application performance in flops (floating point operations per second). The software relies on a linear algebra library as well as an MPI library.
     \end{description}
+
+    \paragraph{}
+    For all infrastructures, running a benchmark between cores on the same host is referred to as shared host memory (SHM). Running a job between hosts is normally over Ethernet connection (TCP) but on SCARF there is the additional option of running over Infiniband (IBV). In general benchmarks are repeated five times for each setup to ensure that there is some consistency amongst results. On the Cloud, there is no exclusive option so other users' activity on the hypervisors can only be accounted for by averaging over more repeats (30).
 
     \subsection{Installation} \label{installation}
 
@@ -280,7 +291,7 @@ done
             \begin{enumerate}
                 \item Install IMB PingPong in the home directory of both VMs and setup SSH as in section \ref{cloud-installation}.
                 \item Create a top directory on the main VM eg \verb|/home/tan49775/Cloud_IMB|.
-                \item Create a script (Code \ref{code:tests-cloud_imb-runimbcloud-sh}) in this top directory which will run a repeat of the benchmark each time it is called, incrementing a count file to keep track of the number of repeats. The script ensures the benchmark is run 30 times within the same host and then 30 times between the two VMs. There is no 'exclusive' on the cloud so the average over a larger number of repeats ensures a better representation of typical use. Use a different \verb|HOME_DIR|, \verb|START_DIR| and host address.
+                \item Create a script (Code \ref{code:tests-cloud_imb-runimbcloud-sh}) in this top directory which will run a repeat of the benchmark each time it is called, incrementing a count file to keep track of the number of repeats. The script ensures the benchmark is run 30 times within the same host and then 30 times between the two VMs. Use a different \verb|HOME_DIR|, \verb|START_DIR| and host address.
                     \begin{code}
                     \captionof{listing}{The script to run IMB once on each call over cron}
                     \label{code:tests-cloud_imb-runimbcloud-sh}
@@ -357,7 +368,7 @@ echo $(($(cat $COUNT) + 1)) > $COUNT
 
 
             \paragraph{}
-            The first parameter to choose is the number of cores to use when running the benchmark. The same number should be chosen for LOTUS, SCARF and the Cloud to allow comparison. Given that the Cloud has a limit of 5 cores per user (split across as many VMs) that specifies an upper bound. The parameters \verb|P| and \verb|Q| should be approximately equal and \verb|P| multiplied by \verb|Q| is the number of processors. In order to avoid \verb|P| or \verb|Q| being 1, 2 was chosen for both values giving a total of 4 cores. To balance across hosts, measurements were taken with four cores from the same node and with two cores on each node.
+            The first parameter to choose is the number of cores to use when running the benchmark. The same number should be chosen for LOTUS, SCARF and the Cloud to allow comparison. The Cloud has a limit of 5 cores per user (split across as many VMs) which specifies an upper bound. The parameters \verb|P| and \verb|Q| should be approximately equal and \verb|P| multiplied by \verb|Q| is the number of processors. To avoid \verb|P| or \verb|Q| being 1, 2 was chosen for both values giving a total of 4 cores. To balance across hosts, measurements were taken with four cores from the same node and with two cores on each node.
 
             \paragraph{}
             Some initial tests were done across the infrastructures to choose a value of \verb|NB| (the block size) that was reasonably well performing with respect to other values in the default interval [32, 256]. However, care was taken to avoid tuning this value to a particular system and these initial test were only to confirm that it was not a radically poor choice for any setup. 180 was used.
@@ -491,7 +502,7 @@ done
 
                 \item Copy in the \verb|HPL.dat| from Appendix \ref{appendix:hpl-conf}.
 
-                \item Create a script (Code \ref{code:tests-cloud_hpl-runhplcloud-sh}) in the top directory which will run a repeat of the benchmark two nodes each time it is called for 30 repeats. A larger number of repeats is used because of the lack of exclusive jobs on the cloud - more results to average. Code \ref{code:tests-cloud_hpl-runhplcloud-sh} only runs the benchmark over two nodes. Use different \verb|HOME_DIR|, \verb|START_DIR| and host addresses.
+                \item Create a script (Code \ref{code:tests-cloud_hpl-runhplcloud-sh}) in the top directory which will run a repeat of the benchmark two nodes each time it is called for 30 repeats. Code \ref{code:tests-cloud_hpl-runhplcloud-sh} runs the benchmark over two nodes (see Code \ref{item:cloud-hpl-one-vm} for how to adapt for one node). Use different \verb|HOME_DIR|, \verb|START_DIR| and host addresses.
 
                     \begin{code}
                     \captionof{listing}{The script to run HPL once on each call over cron over two nodes}
@@ -539,7 +550,7 @@ echo $(($(cat $COUNT) + 1)) > $COUNT
                     \end{minted}
                 \item Copy the output files to a safe place and reinstall the machine as a single VM with 4CPUs and 20GB of RAM.
 
-                \item Repeat steps \ref{item:cloud-hpl-repeat-start} to \ref{item:cloud-hpl-repeat-end} above, removing the flags causing it to run over two nodes.
+                \item \label{item:cloud-hpl-one-vm} Repeat steps \ref{item:cloud-hpl-repeat-start} to \ref{item:cloud-hpl-repeat-end} above, removing the flags causing it to run over two nodes.
 
                 \begin{minted}[breaklines=true]{bash}
 --prefix /usr/lib64/openmpi-1.10/ --map-by node  --rank-by node --host vm275.nubes.stfc.ac.uk,vm15.nubes.stfc.ac.uk
@@ -553,14 +564,14 @@ echo $(($(cat $COUNT) + 1)) > $COUNT
 
 
 \section{Results}
-    \paragraph{} The individual output files for each run were saved and the useful pieces of data were parsed for analysis. This section presents the results and explains the additional experiments to improve and update the results.
+    \paragraph{} The plain text output files for each run were saved parsed for the data. This section presents the results and explains any adaptions to the method after the initial results.
 
     \paragraph{}
-    The busy queues on LOTUS forced submitting some of the benchmarks with different 'BSUB' parameters to the methods section. For all jobs on 'ivybridge2000G' and 3 HPL on 'ivybridge512G' over two hosts, the jobs were waiting for weeks without being run. Instead, a host reservation was used - removing the \mintinline{bash}{-m} parameter and adding a \mintinline{bash}{-U}. The different BSUB parameters should have had no effect on the results as they only define how the job is sumbitted rather than how they are run.
+    It should be noted that some LOTUS benchmarks were submitted to LSF differently. For all jobs on 'ivybridge2000G' and 3 HPL on 'ivybridge512G' over two hosts, the jobs were waiting for weeks without being run. Instead, a host reservation was used - removing the \mintinline{bash}{-m} parameter and adding a \mintinline{bash}{-U}. The different bsub parameters should have had no effect on the results as they only define how the job is submitted - all benchmarks were run exclusively.
 
     \subsection{IMB PingPong}
 
-        \subsubsection{SHM first look and adapted experiment}
+        \subsubsection{SHM first look and adaptions to method}
             \begin{figure}[ht]
                 \centering
                 \begin{subfigure}{.5\textwidth}
@@ -581,15 +592,15 @@ echo $(($(cat $COUNT) + 1)) > $COUNT
             Figure \ref{figure:imb-before-cpus} shows the initial results for IMB over SCARF and LOTUS and shared host memory (SHM - between cores on the same host). Each colour represents a different host group (same hardware) and each line is an individual repeat. For each host group, there seems to be two distinct paths rather than one. For example, scarf11 has a bandwidth of roughly \SI{8300}{\mega\byte\per\second} for two repeats but roughly \SI{5200}{\mega\byte\per\second} for the other three at $2^{18}$\si{\byte}. Occasionally (as seen in scarf14) a repeat will begin on the higher path and drop down to the lower (at $2^{17}$ \si{\byte}).
 
             \paragraph{}
-            A likely explanation is the multiple physical CPUs included in each host. Each host has two or more but the job is submitted without specifying the mapping. The random allocation would create the distinct paths. Without mapping, it may be possible for a job to move from one CPU to two CPUs or vice versa which would lead to the switching behavior in Figure \ref{imb-before-cpus}.
+            A likely explanation is the multiple physical CPUs included in each host. Each host has two or more but the job is submitted without specifying the mapping. The random allocation would create the distinct paths. Without mapping, it may be possible for a job to move from one CPU to two CPUs or vice versa which would lead to the switching behavior in Figure \ref{figure:imb-before-cpus}.
 
             \paragraph{}
             To eliminate this variation and to test if this is actually the cause, the tests were repeated over SHM for SCARF and LOTUS, specifically mapping to one or two CPUs. For one CPU, \mintinline{bash}{numactl --cpunodebind=0 --} was passed as a command line option to the respective \mintinline{bash}{mpirun} command. \mintinline{bash}{-cpu_bind=MAP_CPU:0,15} was used for two. If this is the cause of the variation, the new results should exhibit the same distinction but have a unique path for each mapping. The CPU mapping should remove the jumping between paths.
 
             \paragraph{}
-            Figure \ref{figure:imb-after-cpus} shows the new results. Similar distinctions between paths to Figure \ref{figure:imb-before-cpus} are shown to be grouped by the CPU mapping (shown in the key).
+            Figure \ref{figure:imb-after-cpus} shows the new results. Similar distinctions between paths in Figure \ref{figure:imb-before-cpus} are shown to be grouped by the CPU mapping.
 
-            \begin{figure}[ht]
+            \begin{figure}[H]
                 \centering
                 \begin{subfigure}{.5\textwidth}
                   \centering
@@ -601,9 +612,117 @@ echo $(($(cat $COUNT) + 1)) > $COUNT
                   \includegraphics[width=\textwidth]{jasmin_bandwidth-msgsize_shm_split}
                   \caption{LOTUS}
                 \end{subfigure}
-            \caption{After specifying CPU mapping}
+            \caption{After specifying CPU mapping (given after the host group).}
             \label{figure:imb-after-cpus}
             \end{figure}
+
+            \paragraph{} On the Cloud (Figure \ref{figure:imb-cloud-bandwidth-msgsize}) there is also a potential split between using one or two CPUs; the 11:25 and 13:05 runs on 2017-03-22 are considerably slower than the other runs. Unlike SCARF and LOTUS, there is no way to specify CPU mapping so this can't be tested further. The larger number of repeats should ensure results representative of normal Cloud usage.
+
+            \begin{center}
+                \includegraphics[width=\textwidth]{cloud_bandwidth-msgsize_shm}
+                \captionsetup{type=figure}
+                \caption{Cloud - unable to specify CPU mapping}
+                \label{figure:imb-cloud-bandwidth-msgsize}
+            \end{center}
+
+        \subsubsection{Comparison of Latency}
+            \label{analyse-results-imb-latency}
+
+            \begin{figure}[H]
+                \centering
+                \includegraphics[width=\textwidth]{compare_latency-hostgroup}
+                \caption{Comparison of latencies over different infrastructures and interconnects. The mean of repeats for each combination is shown along with error bars for the range of repeats (See Appendix \ref{appendix:latency-data} for data).}
+                \label{fig:compare-latency}
+            \end{figure}
+
+            \paragraph{}
+            The location of the processes has a clear impact on latency (see Figure \ref{fig:compare-latency}). Even ignoring the impact of host group, all the mean results for each host group for SHM-1 are lower than SHM-2 which are lower than IBV which are lower than TCP. The closer the processes, the lower the latency.
+
+            \paragraph{}
+            The effect of newer hardware is less clear. Over TCP, SCARF latencies broadly reduce as hardware improves from 10 to 16. Certainly scarf15's \SI{9.70}{\micro\second} is an improvement on scarf10's \SI{89.49}{\micro\second}. But the results for Infiniband remain mainly constant except for scarf13 which is significantly higher. Within the host (SHM-1 and SHM-2), SCARF hardware tends to get higher latencies with more recent hardware on scarf15/16 the highest for both. The latency results for LOTUS does not seem to depend as significantly on the hardware with all host groups performing similarly although the Broadwell hosts do have notably lower latencies on all three.
+
+            \paragraph{}
+            The Cloud manages to compete with some of the older SCARF hosts (10, 11, 12) over TCP. Without knowing the CPU mapping, it has similar results to the other systems between two CPUs although the other systems have lower latencies when processes are on the same CPU.
+
+            \paragraph{}
+            The scarf13 Infiniband results were additionally repeated 10 times and there was agreement with these results (mean latency \SI{6.36}{\micro\second}) suggesting these were not anomalous, particularly after a wider variety of hosts have been tested.
+
+        \begin{landscape}
+            \begin{figure}[H]
+                \centering
+                \begin{subfigure}{\textwidth}
+                  \centering
+                  \includegraphics[width=\textwidth]{compare_bandwidth-hostgroup_8192}
+                  \caption{SCARF}
+                \end{subfigure}
+
+                \begin{subfigure}{\textwidth}
+                  \centering
+                  \includegraphics[width=\textwidth]{compare_bandwidth-hostgroup_8192}
+                  \caption{LOTUS}
+                \end{subfigure}
+                \caption{OVERALL CAPTION (halfway)}
+            \end{figure}
+
+            \begin{figure}[H]
+                \centering
+                \begin{subfigure}{\textwidth}
+                  \includegraphics[width=\textwidth]{compare_bandwidth-hostgroup_32768}
+                  \caption{LOTUS}
+                \end{subfigure}
+
+                \begin{subfigure}{\textwidth}
+                  \centering
+                  \includegraphics[width=\textwidth]{compare_bandwidth-hostgroup_max}
+                  \caption{LOTUS}
+                \end{subfigure}
+            \caption{OVERALL CAPTION}
+            \label{figure:asdfasdfa}
+            \end{figure}
+
+
+            % \begin{center}
+            %     \includegraphics[]{compare_bandwidth-hostgroup_1024}
+            %     \captionsetup{type=figure}
+            %     \caption{1024B}
+            % \end{center}
+            % \begin{center}
+            %     \includegraphics[width=\textwidth]{compare_bandwidth-hostgroup_8192}
+            %     \captionsetup{type=figure}
+            %     \caption{8096B}
+            % \end{center}
+            % \begin{center}
+            %     \includegraphics[width=\textwidth]{compare_bandwidth-hostgroup_32768}
+            %     \captionsetup{type=figure}
+            %     \caption{32768B}
+            % \end{center}
+            % \begin{center}
+            %     \includegraphics[width=\textwidth]{compare_bandwidth-hostgroup_max}
+            %     \captionsetup{type=figure}
+            %     \caption{Maximum over all message sizes}
+            % \label{figure:compare-bandwidths-container}
+            % \end{center}
+
+        \end{landscape}
+
+
+
+        \subsubsection{Comparison of Bandwidth}
+            \label{analyse-results-imb-bandwidth}
+
+            \paragraph{}
+            Figure TODO, TODO, TODO and TODO show a comparison of the results for bandwidth (see \ref{appendix:bandwidth-data} for the data).
+
+            \paragraph{}
+            The first point to note is that for each message size on each host group, the order of bandwidths is the same: SHM with one CPU, SHM between two CPUs, IBV and then TCP. This is expected as data transfer between CPUs or hosts is generally slower than travelling within them.
+
+            Infiniband is seen as the faster (and default) networking option on SCARF.
+
+
+
+
+
+
 
 
     \subsection{HPL}
@@ -680,7 +799,7 @@ echo $(($(cat $COUNT) + 1)) > $COUNT
     \label{appendix:makefile}
 
     \paragraph{}
-    This make file is used to link the HPL binary to the libraries it requires. The comments are removed for clarity but the format follows the example in the \verb|hpl-2.2.tar| archive \verb|hpl-2.2/setup/Make.Linux_Intel64|. It should be saved as \verb|hpl-2.2/Make.Linux_SL6_Intel64|.
+    The comments are removed but the format follows the example in the \verb|hpl-2.2.tar| archive \verb|hpl-2.2/setup/Make.Linux_Intel64|. It should be saved as \verb|hpl-2.2/Make.Linux_SL6_Intel64|.
         \begin{code}
         \captionof{listing}{The HPL SL6 Makefile}
         \label{code:builds-cloud-make-linux_sl6_intel64}
@@ -724,8 +843,6 @@ RANLIB       = echo
     \subsection{IMB Example Output}
         \label{appendix:imb-example-output}
 
-        \paragraph{}
-        The following is a section of the output from the IMB PingPong benchmark. The general information (e.g. start time) has been removed from the header, leaving just the output.
         \begin{minted}{text}
 #---------------------------------------------------
 # Benchmarking PingPong
@@ -762,9 +879,6 @@ RANLIB       = echo
 
     \subsection{HPL Configuration File}
         \label{appendix:hpl-conf}
-
-        \paragraph{}
-        The configuration file that was used with every HPL test is given below.
 
         \begin{minted}{text}
 The HPL Configuration File for comparing LOTUS, SCARF
@@ -805,8 +919,6 @@ not_used     output file name (if any)
     \subsection{HPL Example Output}
         \label{appendix:hpl-example-output}
 
-        \paragraph{}
-        The following is the output from a run of the HPL Benchmark. The description of the parameters has been truncated as well as the intermediate results.
 
         \begin{minted}{text}
 ================================================================================
@@ -858,5 +970,152 @@ End of Tests.
 ================================================================================
 
         \end{minted}
+    \subsection{Latency Data}
+        \label{appendix:latency-data}
+
+        \begin{center}
+            \centering
+            \begin{tabular}{ |c||c|c|c|c|  }
+             \hline
+             \multirow{2}{*}{Hostgroup} & \multicolumn{4}{c|}{Mean latency / \si{\micro\second}} \\
+             \cline{2-5}
+                                      & SHM-1 & SHM-2 & TCP & IBV\\
+             \hline
+                Cloud & \multicolumn{2}{c|}{0.31} & 54.74 & n/a\\
+                scarf10 & 0.16 & 0.32 & 89.49 & 4.38\\
+                scarf11 & 0.12 & 0.24 & 77.21 & 1.83\\
+                scarf12 & 0.11 & 0.23 & 83.53 & 1.71\\
+                scarf13 & 0.16 & 0.31 & 35.22 & 6.55\\
+                scarf14 & 0.13 & 0.32 & 26.93 & 2.22\\
+                scarf15 & 0.21 & 0.34 & 9.70 & 2.02\\
+                scarf16 & 0.22 & 0.34 & 16.44 & 1.47\\
+                broadwell256G & 0.14 & 0.30 & 7.17 & n/a\\
+                haswell256G & 0.19 & 0.37 & 11.05 & n/a\\
+                ivybridge128G & 0.13 & 0.32 & 11.99 & n/a\\
+                ivybridge2000G & 0.16 & 0.39 & 15.90 & n/a\\
+                ivybridge512G & 0.13 & 0.40 & 10.89 & n/a\\
+
+             \hline
+            \end{tabular}
+            \captionsetup{type=table}
+            \caption{The mean latency over all repeats, split by hostgroup as shown in figure TODO}
+        \end{center}
+
+
+
+
+
+
+    \subsection{Bandwidth Data}
+        \label{appendix:bandwidth-data}
+
+        \begin{center}
+            \centering
+            \begin{tabular}{ |c||c|c|c|c|  }
+             \hline
+             \multirow{2}{*}{Hostgroup} & \multicolumn{4}{c|}{Mean bandwidth of 1024B messages / \si{\mega\byte\per\second}} \\
+             \cline{2-5}
+                                      & SHM-1 & SHM-2 & TCP & IBV\\
+             \hline
+                Cloud & \multicolumn{2}{c|}{1086.01} & 15.58 & n/a\\
+                scarf10 & 2035.05 & 1132.61 & 8.90 & 109.43\\
+                scarf11 & 2443.99 & 1318.35 & 9.63 & 225.26\\
+                scarf12 & 2694.70 & 1355.99 & 9.30 & 234.97\\
+                scarf13 & 1739.76 & 995.17 & 16.31 & 123.09\\
+                scarf14 & 2103.48 & 1058.89 & 17.76 & 154.32\\
+                scarf15 & 1659.08 & 927.46 & 83.44 & 243.07\\
+                scarf16 & 1644.23 & 942.36 & 53.18 & 278.32\\
+                broadwell256G & 2547.62 & 1263.69 & 102.12 & n/a\\
+                haswell256G & 1724.22 & 975.50 & 73.79 & n/a\\
+                ivybridge128G & 2121.81 & 1127.32 & 60.85 & n/a\\
+                ivybridge2000G & 1695.40 & 775.68 & 44.79 & n/a\\
+                ivybridge512G & 2065.02 & 1167.25 & 69.32 & n/a\\
+             \hline
+            \end{tabular}
+            \captionsetup{type=table}
+            \caption{The mean bandwidth for the 1024B messages split by hostgroup as shown in figure TODO}
+        \end{center}
+
+         \begin{center}
+            \centering
+            \begin{tabular}{ |c||c|c|c|c|  }
+             \hline
+             \multirow{2}{*}{Hostgroup} & \multicolumn{4}{c|}{Mean bandwidth of 8192B messages / \si{\mega\byte\per\second}} \\
+             \cline{2-5}
+                                      & SHM-1 & SHM-2 & TCP & IBV\\
+             \hline
+                Cloud & \multicolumn{2}{c|}{2331.78} & 70.82 & n/a\\
+                scarf10 & 3786.75 & 2269.98 & 39.92 & 468.49\\
+                scarf11 & 4266.71 & 2559.63 & 45.96 & 913.84\\
+                scarf12 & 4399.96 & 2601.34 & 45.63 & 935.66\\
+                scarf13 & 3153.47 & 1891.89 & 32.81 & 579.11\\
+                scarf14 & 3735.09 & 2005.55 & 33.34 & 822.42\\
+                scarf15 & 2513.02 & 2563.46 & 318.38 & 988.26\\
+                scarf16 & 2566.26 & 2568.84 & 233.96 & 1122.51\\
+                broadwell256G & 4615.70 & 2204.37 & 352.73 & n/a\\
+                haswell256G & 3248.41 & 1752.09 & 289.13 & n/a\\
+                ivybridge128G & 3794.90 & 2106.11 & 235.51 & n/a\\
+                ivybridge2000G & 3479.32 & 1514.62 & 188.94 & n/a\\
+                ivybridge512G & 3785.00 & 1983.11 & 295.25 & n/a\\
+             \hline
+            \end{tabular}
+            \captionsetup{type=table}
+            \caption{The mean bandwidth for the 8192B messages split by hostgroup as shown in figure TODO}
+        \end{center}
+
+         \begin{center}
+            \centering
+            \begin{tabular}{ |c||c|c|c|c|  }
+             \hline
+             \multirow{2}{*}{Hostgroup} & \multicolumn{4}{c|}{Mean bandwidth of 32768B messages/ \si{\mega\byte\per\second}} \\
+             \cline{2-5}
+                                      & SHM-1 & SHM-2 & TCP & IBV\\
+             \hline
+                Cloud & \multicolumn{2}{c|}{3164.26} & 184.26 & n/a\\
+                scarf10 & 5432.64 & 3478.14 & 34.99 & 654.38\\
+                scarf11 & 6071.52 & 3879.78 & 48.05 & 1699.70\\
+                scarf12 & 6503.35 & 3952.47 & 40.03 & 1743.98\\
+                scarf13 & 4855.00 & 2841.63 & 55.67 & 747.12\\
+                scarf14 & 5775.77 & 2931.54 & 56.77 & 1796.93\\
+                scarf15 & 3486.68 & 3905.40 & 463.96 & 2308.61\\
+                scarf16 & 3473.62 & 3881.20 & 342.79 & 2702.85\\
+                broadwell256G & 7150.79 & 3160.15 & 502.72 & n/a\\
+                haswell256G & 4872.27 & 2633.92 & 409.64 & n/a\\
+                ivybridge128G & 6045.88 & 3041.11 & 371.36 & n/a\\
+                ivybridge2000G & 5605.09 & 1968.71 & 311.79 & n/a\\
+                ivybridge512G & 6033.94 & 2946.58 & 429.37 & n/a\\
+             \hline
+            \end{tabular}
+            \captionsetup{type=table}
+            \caption{The mean bandwidth for the 32768B messages split by hostgroup as shown in figure TODO}
+        \end{center}
+
+         \begin{center}
+            \centering
+            \begin{tabular}{ |c||c|c|c|c|  }
+             \hline
+             \multirow{2}{*}{Hostgroup} & \multicolumn{4}{c|}{Mean of max bandwidths / \si{\mega\byte\per\second}} \\
+             \cline{2-5}
+                                      & SHM-1 & SHM-2 & TCP & IBV\\
+             \hline
+                Cloud & \multicolumn{2}{c|}{6504.27} & 456.42 & n/a\\
+                scarf10 & 7419.95 & 5048.19 & 101.54 & 1270.66\\
+                scarf11 & 8877.11 & 6974.27 & 103.09 & 3215.99\\
+                scarf12 & 9121.70 & 5787.32 & 102.91 & 3207.53\\
+                scarf13 & 7504.84 & 3927.28 & 110.51 & 2940.26\\
+                scarf14 & 9153.45 & 3973.65 & 111.81 & 3267.56\\
+                scarf15 & 5145.80 & 5876.91 & 825.88 & 5670.07\\
+                scarf16 & 5140.57 & 5905.49 & 934.16 & 5975.28\\
+                broadwell256G & 11468.01 & 5920.18 & 1174.91 & n/a\\
+                haswell256G & 7683.80 & 5006.57 & 1171.09 & n/a\\
+                ivybridge128G & 9115.23 & 4299.59 & 1172.70 & n/a\\
+                ivybridge2000G & 7808.32 & 2417.75 & 1163.62 & n/a\\
+                ivybridge512G & 9082.18 & 4167.02 & 1172.76 & n/a\\
+
+             \hline
+            \end{tabular}
+            \captionsetup{type=table}
+            \caption{The mean of the max bandwidth over all message sizes for each hostgroup as shown in figure TODO}
+        \end{center}
 
 \end{document}
