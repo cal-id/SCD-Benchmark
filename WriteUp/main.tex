@@ -1,3 +1,6 @@
+% To see package versions
+%\listfiles%
+
 \documentclass{article}
 \usepackage[utf8]{inputenc}
 % for large margins
@@ -11,6 +14,9 @@
 \usepackage[T1]{fontenc}
 % \usepackage{beramono}
 
+%for units
+\usepackage[binary-units=true]{siunitx}
+
 % to format the code
 \usepackage[newfloat]{minted}
 \usemintedstyle{borland}
@@ -23,6 +29,11 @@
 
 % to link to mimic
 \usepackage{hyperref}
+
+% to put graphs in
+\usepackage{graphicx}
+\graphicspath{ {images/} }
+\usepackage{subcaption}
 
 
 % bibliography
@@ -66,6 +77,9 @@ This is the abstract which is definitely TODO!
 
         \paragraph{}
         Two specific metrics are recorded - bandwidth and latency - using the IMB PingPong benchmark. Application performance is then measured more generally according to the results from the HPL TOP500 test. On SCARF and LOTUS, these are taken on cores on the same node, spanning different nodes, and on different hardware versions. On the Cloud, they are taken from one VM and across two VMs (on different hypervisors).
+
+    \subsection{Report Layout}
+    TODO!
 
 \section{Methods}
 
@@ -266,7 +280,7 @@ done
             \begin{enumerate}
                 \item Install IMB PingPong in the home directory of both VMs and setup SSH as in section \ref{cloud-installation}.
                 \item Create a top directory on the main VM eg \verb|/home/tan49775/Cloud_IMB|.
-                \item Create a script (Code \ref{code:tests-cloud_imb-runimbcloud-sh}) in this top directory which will run a repeat of the benchmark each time it is called, incrementing a count file to keep track of the number of repeats. The script ensures the benchmark is run 30 times within the same host and then 30 times between the two VMs. There is no 'exclusive' on the cloud so the average over a larger number of repeats ensures a better representation of typical use. Use a different \verb|HOME_DIR|, \verb|START_DIR| and host addresses.
+                \item Create a script (Code \ref{code:tests-cloud_imb-runimbcloud-sh}) in this top directory which will run a repeat of the benchmark each time it is called, incrementing a count file to keep track of the number of repeats. The script ensures the benchmark is run 30 times within the same host and then 30 times between the two VMs. There is no 'exclusive' on the cloud so the average over a larger number of repeats ensures a better representation of typical use. Use a different \verb|HOME_DIR|, \verb|START_DIR| and host address.
                     \begin{code}
                     \captionof{listing}{The script to run IMB once on each call over cron}
                     \label{code:tests-cloud_imb-runimbcloud-sh}
@@ -323,6 +337,7 @@ echo $(($(cat $COUNT) + 1)) > $COUNT
                     \end{minted}
                 \item Again, similar output files are produced.
             \end{enumerate}
+
         \subsubsection{Interpreting Results}
             \paragraph{}
             The standard output from IMB PingPong is shown in Appendix \ref{appendix:imb-example-output}. As explained in Section \ref{overview-of-methods}, latency is recorded from the first entry in the \verb|t[usec]| column - where the message size is zero. Bandwidth is recorded from the \verb|Mbytes/sec| column. Different message sizes are of interest.
@@ -342,16 +357,16 @@ echo $(($(cat $COUNT) + 1)) > $COUNT
 
 
             \paragraph{}
-            The first parameter to choose is the number of cores to use when running the benchmark. The same number should be chosen for LOTUS, SCARF and the Cloud to allow comparison. Given that the Cloud has a limit of 5 cores per user (split across as many VMs) that specifies an upper bound. The parameters \verb|P| and \verb|Q| should be approximately equal and \verb|P| multiplied by \verb|Q| is the number of processors. In order to avoid \verb|P| or \verb|Q| being 1, 2 was chosen for both values giving a total of 4 cores. In order to balance these across hosts, measurements were taken with four cores from the same node and with two cores on each node.
+            The first parameter to choose is the number of cores to use when running the benchmark. The same number should be chosen for LOTUS, SCARF and the Cloud to allow comparison. Given that the Cloud has a limit of 5 cores per user (split across as many VMs) that specifies an upper bound. The parameters \verb|P| and \verb|Q| should be approximately equal and \verb|P| multiplied by \verb|Q| is the number of processors. In order to avoid \verb|P| or \verb|Q| being 1, 2 was chosen for both values giving a total of 4 cores. To balance across hosts, measurements were taken with four cores from the same node and with two cores on each node.
 
             \paragraph{}
-            Some initial tests were done across the infrastructures to choose a value of \verb|NB| (the block size) that was reasonably well performing with respect to other values in the default interval [32, 256]. However, care was taken to avoid tuning this value to a particular system and these initial test were only to confirm that it was not a radically poor choice for any setup. The value 180 was decided on.
+            Some initial tests were done across the infrastructures to choose a value of \verb|NB| (the block size) that was reasonably well performing with respect to other values in the default interval [32, 256]. However, care was taken to avoid tuning this value to a particular system and these initial test were only to confirm that it was not a radically poor choice for any setup. 180 was used.
 
             \paragraph{}
             The main parameter is 'problem size' (\verb|N|)  which is the side length of the matrix to be solved. According to \cite{hpl2016}, the largest size that will fit in memory is recommended. The Cloud limits users to 20GB of memory so this was used as an upper bound. Each element in the matrix is a double precision float (8 bytes). This means that a total of $2.5 \times 10 ^ 9$ elements can be used. Using the recommend 80\% figure (to leave room for the OS), this gives a side length of around 44721. It is also beneficial to have a multiple of NB so 44640 was chosen.
 
             \paragraph{}
-            Provided the same file is used for each test, to an extent, the content of this file is insignificant - it will still provide a comparison of parallel application performance. Where possible, advice provided in the "FAQ" and "tuning" sections of \cite{hpl2016} was followed, using default or suggested values if provided to attempt to remain neutral. Of course, it would be possible to tune this configuration file for each setup and achieve some faster speeds but this would likely be at the expense of other setups and introduce a bias. Any case where there was no default value given is justified above.
+            Provided the same file is used for each test (to an extent) the content of this file is insignificant - it will still provide a comparison of parallel application performance. Where possible, advice in the "FAQ" and "tuning" sections of \cite{hpl2016} was followed, using default or suggested values to attempt to remain neutral. Of course, it would be possible to tune this configuration file for each setup and achieve some faster speeds but this would likely be at the expense of other setups and introduce a bias. Any case where there was no default value given is justified above.
 
 
 
@@ -360,7 +375,7 @@ echo $(($(cat $COUNT) + 1)) > $COUNT
         \begin{enumerate}
             \item Create a top directory (e.g. \verb|/home/cseg/scarf656/SCARF_HPL|) and \verb|cd| into it.
             \item Run \mintinline{bash}{bsub -m scarf10 "cp /apps/procspec/hpl/2.2/bin/Linux_Intel64/xhpl ."} to copy the SCARF10 precompiled HPL binary into this directory.
-            \item Copy in \verb|HPL.dat| from the Appendix \ref{appendix:hpl-conf}.
+            \item Copy in \verb|HPL.dat| from Appendix \ref{appendix:hpl-conf}.
             \item Submit jobs to run the benchmark for five repeats across each host group. For each host group, run the benchmark between two hosts using TCP and using Infiniband; and on the same host. Use Code \ref{code:tests-scarf_hpl-runhplscarf-sh} from inside the top directory.
 
 
@@ -418,7 +433,7 @@ done
 
             \item Create a top directory (e.g. \verb|/home/users/ciddon/JASMIN_HPL|) and \verb|cd| into it.
 
-            \item Copy in \verb|HPL.dat| from the Appendix \ref{appendix:hpl-conf}.
+            \item Copy in \verb|HPL.dat| from Appendix \ref{appendix:hpl-conf}.
 
             \item Submit jobs to run the benchmark for five repeats across each host group. For each host group, run the benchmark between two hosts and on the same host. Use Code \ref{code:tests-jasmin_hpl-runhpljasmin-sh} from inside the top directory.
 
@@ -463,10 +478,133 @@ done
 
         \subsubsection{Cloud}
 
+            \paragraph{}
+            The Cloud limits total memory per user to 20GB. All this is required for each test so run them over two VMs (2CPUs and 10GB RAM each) and then install a single VM (4 CPUs and 20GB RAM) to run the individual tests.
+
+            \paragraph{}
+            Use \url{http://mimic.gridpp.rl.ac.uk/} to as described for running IMB to check that then VMs are on different hypervisors.
+
+            \begin{enumerate}
+                \item \label{item:cloud-hpl-repeat-start} Install HPL in the home direction of both VMs using \ref{code:builds-cloud-build-sh}
+
+                \item Create a top directory under the main VM eg \verb|/home/tan49775/Cloud_HPL|.
+
+                \item Copy in the \verb|HPL.dat| from Appendix \ref{appendix:hpl-conf}.
+
+                \item Create a script (Code \ref{code:tests-cloud_hpl-runhplcloud-sh}) in the top directory which will run a repeat of the benchmark two nodes each time it is called for 30 repeats. A larger number of repeats is used because of the lack of exclusive jobs on the cloud - more results to average. Code \ref{code:tests-cloud_hpl-runhplcloud-sh} only runs the benchmark over two nodes. Use different \verb|HOME_DIR|, \verb|START_DIR| and host addresses.
+
+                    \begin{code}
+                    \captionof{listing}{The script to run HPL once on each call over cron over two nodes}
+                    \label{code:tests-cloud_hpl-runhplcloud-sh}
+                    \begin{minted}[breaklines=true]{bash}
+#! /bin/bash
+
+source /etc/profile.d/modules.sh
+module load openmpi-1.10-x86_64
+
+REPEATS=30
+HOME_DIR=/home/tan49775  # should contain hpl-2.2 and Cloud_HPL
+START_DIR=$HOME_DIR/Cloud_HPL
+COUNT=$START_DIR/count
+
+
+# Make the output directory if needed
+mkdir -p $START_DIR/outputs
+cd $START_DIR
+
+num=$(date +"%Y%m%d_%H%M%S")
+outputFile=$START_DIR/outputs/$num.out
+errorFile=$START_DIR/outputs/$num.err
+
+# If the count file does not exist then initialise it
+if [ ! -s $COUNT ]; then echo "1" > $COUNT; fi
+
+# If done enough repeats then exit
+if [ $(cat $COUNT) -gt $REPEATS ]; then exit 0; fi
+
+
+# Run the benchmark
+mpirun -np 4 --prefix /usr/lib64/openmpi-1.10/ --map-by node  --rank-by node --host vm275.nubes.stfc.ac.uk,vm15.nubes.stfc.ac.uk $HOME_DIR/hpl-2.2/bin/Linux_SL6_Intel64/xhpl 2> $errorFile >> $outputFile
+
+# Increment the count file
+echo $(($(cat $COUNT) + 1)) > $COUNT
+                    \end{minted}
+                    \end{code}
+
+                \item Make the script executable using \mintinline{bash}{chmod 755 run_HPL_Cloud_2Nodes.sh}.
+                \item \label{item:cloud-hpl-repeat-end} Setup a crontab to run the script at 50 minute intervals.
+
+                    \begin{minted}{bash}
+50 * * * * /home/tan49775/Cloud_HPL/run_HPL_Cloud_2Nodes.sh
+                    \end{minted}
+                \item Copy the output files to a safe place and reinstall the machine as a single VM with 4CPUs and 20GB of RAM.
+
+                \item Repeat steps \ref{item:cloud-hpl-repeat-start} to \ref{item:cloud-hpl-repeat-end} above, removing the flags causing it to run over two nodes.
+
+                \begin{minted}[breaklines=true]{bash}
+--prefix /usr/lib64/openmpi-1.10/ --map-by node  --rank-by node --host vm275.nubes.stfc.ac.uk,vm15.nubes.stfc.ac.uk
+                \end{minted}
+
+            \end{enumerate}
+
+
+        \subsubsection{Interpreting Results}
+            Appendix \ref{appendix:hpl-example-output} contains an example output from one run of HPL. The result of this benchmark is the final value for 'Gflops' (3.297e+01 in this case).
+
 
 \section{Results}
+    \paragraph{} The individual output files for each run were saved and the useful pieces of data were parsed for analysis. This section presents the results and explains the additional experiments to improve and update the results.
+
+    \paragraph{}
+    The busy queues on LOTUS forced submitting some of the benchmarks with different 'BSUB' parameters to the methods section. For all jobs on 'ivybridge2000G' and 3 HPL on 'ivybridge512G' over two hosts, the jobs were waiting for weeks without being run. Instead, a host reservation was used - removing the \mintinline{bash}{-m} parameter and adding a \mintinline{bash}{-U}. The different BSUB parameters should have had no effect on the results as they only define how the job is sumbitted rather than how they are run.
 
     \subsection{IMB PingPong}
+
+        \subsubsection{SHM first look and adapted experiment}
+            \begin{figure}[ht]
+                \centering
+                \begin{subfigure}{.5\textwidth}
+                  \centering
+                  \includegraphics[width=\textwidth]{scarf_bandwidth-msgsize_shm}
+                  \caption{SCARF}
+                \end{subfigure}%
+                \begin{subfigure}{.5\textwidth}
+                  \centering
+                  \includegraphics[width=\textwidth]{jasmin_bandwidth-msgsize_shm}
+                  \caption{LOTUS}
+                \end{subfigure}
+            \caption{Before specifying CPUs}
+            \label{figure:imb-before-cpus}
+            \end{figure}
+
+            \paragraph{}
+            Figure \ref{figure:imb-before-cpus} shows the initial results for IMB over SCARF and LOTUS and shared host memory (SHM - between cores on the same host). Each colour represents a different host group (same hardware) and each line is an individual repeat. For each host group, there seems to be two distinct paths rather than one. For example, scarf11 has a bandwidth of roughly \SI{8300}{\mega\byte\per\second} for two repeats but roughly \SI{5200}{\mega\byte\per\second} for the other three at $2^{18}$\si{\byte}. Occasionally (as seen in scarf14) a repeat will begin on the higher path and drop down to the lower (at $2^{17}$ \si{\byte}).
+
+            \paragraph{}
+            A likely explanation is the multiple physical CPUs included in each host. Each host has two or more but the job is submitted without specifying the mapping. The random allocation would create the distinct paths. Without mapping, it may be possible for a job to move from one CPU to two CPUs or vice versa which would lead to the switching behavior in Figure \ref{imb-before-cpus}.
+
+            \paragraph{}
+            To eliminate this variation and to test if this is actually the cause, the tests were repeated over SHM for SCARF and LOTUS, specifically mapping to one or two CPUs. For one CPU, \mintinline{bash}{numactl --cpunodebind=0 --} was passed as a command line option to the respective \mintinline{bash}{mpirun} command. \mintinline{bash}{-cpu_bind=MAP_CPU:0,15} was used for two. If this is the cause of the variation, the new results should exhibit the same distinction but have a unique path for each mapping. The CPU mapping should remove the jumping between paths.
+
+            \paragraph{}
+            Figure \ref{figure:imb-after-cpus} shows the new results. Similar distinctions between paths to Figure \ref{figure:imb-before-cpus} are shown to be grouped by the CPU mapping (shown in the key).
+
+            \begin{figure}[ht]
+                \centering
+                \begin{subfigure}{.5\textwidth}
+                  \centering
+                  \includegraphics[width=\textwidth]{scarf_bandwidth-msgsize_shm_split}
+                  \caption{SCARF}
+                \end{subfigure}%
+                \begin{subfigure}{.5\textwidth}
+                  \centering
+                  \includegraphics[width=\textwidth]{jasmin_bandwidth-msgsize_shm_split}
+                  \caption{LOTUS}
+                \end{subfigure}
+            \caption{After specifying CPU mapping}
+            \label{figure:imb-after-cpus}
+            \end{figure}
+
 
     \subsection{HPL}
 
@@ -474,11 +612,74 @@ done
 
 \section{Conclusion}
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 \printbibliography[title={Sources}]
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 \appendix
-    \section{HPL SL6 Makefile}
+    \section*{Appendices}
+    \addcontentsline{toc}{section}{Appendices}
+    \renewcommand{\thesubsection}{\Alph{subsection}}
+
+    \subsection{HPL SL6 Makefile}
     \label{appendix:makefile}
+
+    \paragraph{}
     This make file is used to link the HPL binary to the libraries it requires. The comments are removed for clarity but the format follows the example in the \verb|hpl-2.2.tar| archive \verb|hpl-2.2/setup/Make.Linux_Intel64|. It should be saved as \verb|hpl-2.2/Make.Linux_SL6_Intel64|.
         \begin{code}
         \captionof{listing}{The HPL SL6 Makefile}
@@ -520,10 +721,11 @@ RANLIB       = echo
         \end{minted}
         \end{code}
 
-    \section{IMB Example Output}
+    \subsection{IMB Example Output}
         \label{appendix:imb-example-output}
-        The following is a section of the output from the IMB PingPong benchmark. The general information (e.g. start time) has been removed
-        from the header, leaving just the output.
+
+        \paragraph{}
+        The following is a section of the output from the IMB PingPong benchmark. The general information (e.g. start time) has been removed from the header, leaving just the output.
         \begin{minted}{text}
 #---------------------------------------------------
 # Benchmarking PingPong
@@ -558,7 +760,7 @@ RANLIB       = echo
      16777216         1000      3617.98      4422.35
         \end{minted}
 
-    \section{HPL Configuration File}
+    \subsection{HPL Configuration File}
         \label{appendix:hpl-conf}
 
         \paragraph{}
@@ -596,6 +798,64 @@ not_used     output file name (if any)
 0            U  in (0=transposed,1=no-transposed) form
 1            Equilibration (0=no,1=yes)
 8            memory alignment in double (> 0)
+
+        \end{minted}
+
+
+    \subsection{HPL Example Output}
+        \label{appendix:hpl-example-output}
+
+        \paragraph{}
+        The following is the output from a run of the HPL Benchmark. The description of the parameters has been truncated as well as the intermediate results.
+
+        \begin{minted}{text}
+================================================================================
+HPLinpack 2.2  --  High-Performance Linpack benchmark  --   February 24, 2016
+Written by A. Petitet and R. Clint Whaley,  Innovative Computing Laboratory, UTK
+Modified by Piotr Luszczek, Innovative Computing Laboratory, UTK
+Modified by Julien Langou, University of Colorado Denver
+================================================================================
+...
+--------------------------------------------------------------------------------
+
+- The matrix A is randomly generated for each test.
+- The following scaled residual check will be computed:
+      ||Ax-b||_oo / ( eps * ( || x ||_oo * || A ||_oo + || b ||_oo ) * N )
+- The relative machine precision (eps) is taken to be               1.110223e-16
+- Computational tests pass if scaled residuals are less than                16.0
+
+Column=000000180 Fraction= 0.4% Gflops=5.839e+03
+Column=000000360 Fraction= 0.8% Gflops=6.953e+01
+Column=000000540 Fraction= 1.2% Gflops=5.027e+01
+...
+Column=000044460 Fraction=99.6% Gflops=3.297e+01
+================================================================================
+T/V                N    NB     P     Q               Time                 Gflops
+--------------------------------------------------------------------------------
+WR11R2C4       44640   180     2     2            1799.04              3.297e+01
+HPL_pdgesv() start time Sun Mar 26 23:50:20 2017
+
+HPL_pdgesv() end time   Mon Mar 27 00:20:19 2017
+
+--VVV--VVV--VVV--VVV--VVV--VVV--VVV--VVV--VVV--VVV--VVV--VVV--VVV--VVV--VVV-
+Max aggregated wall time rfact . . . :               6.76
++ Max aggregated wall time pfact . . :               1.22
++ Max aggregated wall time mxswp . . :               0.62
+Max aggregated wall time update  . . :            1792.06
++ Max aggregated wall time laswp . . :              49.64
+Max aggregated wall time up tr sv  . :               0.36
+--------------------------------------------------------------------------------
+||Ax-b||_oo/(eps*(||A||_oo*||x||_oo+||b||_oo)*N)=        0.0006845 ...... PASSED
+================================================================================
+
+Finished      1 tests with the following results:
+              1 tests completed and passed residual checks,
+              0 tests completed and failed residual checks,
+              0 tests skipped because of illegal input values.
+--------------------------------------------------------------------------------
+
+End of Tests.
+================================================================================
 
         \end{minted}
 
