@@ -1,2 +1,5 @@
 # Default Behaviour
 * text eol=lf
+*.png binary -text
+*.pdf binary -text
+*.svg binary -text
