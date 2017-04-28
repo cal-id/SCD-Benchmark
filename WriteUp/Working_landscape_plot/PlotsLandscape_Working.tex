@@ -1,0 +1,68 @@
+\documentclass{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[margin=1in]{geometry}
+\usepackage{pgfplots}
+%\usepgfplotslibrary{plotmarks}
+
+\usepackage{pdflscape}
+
+\usepackage{float}
+\usepackage{subcaption}
+
+\title{test plots}
+\author{callum.iddon }
+\date{April 2017}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+
+
+\newlength\figureheight
+\newlength\figurewidth
+\setlength\figureheight{7cm}
+\setlength\figurewidth{\textwidth}
+
+\begin{landscape}
+ \begin{figure}[H]
+    \centering
+    \begin{subfigure}{\textwidth}
+      \centering
+        \input{compare_bandwidth-hostgroup_1024.tex}
+    %   \includegraphics[width=\textwidth]{compare_bandwidth-hostgroup_8192}
+      \caption{SCARF}
+    \end{subfigure}
+
+    \begin{subfigure}{\textwidth}
+      \centering
+        \input{compare_bandwidth-hostgroup_8192.tex}
+    %   \includegraphics[width=\textwidth]{compare_bandwidth-hostgroup_8192}
+      \caption{LOTUS}
+    \end{subfigure}
+    \caption{OVERALL CAPTION (halfway)}
+ \end{figure}
+
+ \begin{figure}[H]\ContinuedFloat
+    \centering
+    \begin{subfigure}{\textwidth}
+      \centering
+        \input{compare_bandwidth-hostgroup_32768.tex}
+    %   \includegraphics[width=\textwidth]{compare_bandwidth-hostgroup_8192}
+      \caption{SCARF}
+    \end{subfigure}
+
+    \begin{subfigure}{\textwidth}
+      \centering
+        \input{compare_bandwidth-hostgroup_max.tex}
+    %   \includegraphics[width=\textwidth]{compare_bandwidth-hostgroup_8192}
+      \caption{LOTUS}
+    \end{subfigure}
+    \caption{OVERALL CAPTION (halfway)}
+ \end{figure}
+\end{landscape}
+
+
+\end{document}
