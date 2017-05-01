@@ -3,6 +3,10 @@ Usage:
 python3 parse_tex_units.py <file> <key> <siunitx_to_append>
 
 Note: use quotes eg "\micro\second" to keep siunitx_to_append
+
+
+Bash script
+for f in *.tex; do python3 parse_tex_units.py $f ylabel "\mega\byte\per\second"; done;
 '''
 
 
