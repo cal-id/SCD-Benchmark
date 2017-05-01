@@ -6,7 +6,7 @@ Note: use quotes eg "\micro\second" to keep siunitx_to_append
 '''
 
 
-def parse_tex_bar_chart(fName, key, siunitx):
+def parse_tex_units(fName, key, siunitx):
     '''
     Deals with matplotlib2tikz not accepting mpl's latex units using
     \mathregular by adding siunitx units.
@@ -44,4 +44,4 @@ def parse_tex_bar_chart(fName, key, siunitx):
 if __name__ == "__main__":
     import sys
     assert len(sys.argv) == 4
-    parse_tex_bar_chart(*sys.argv[1:])
+    parse_tex_units(*sys.argv[1:])
