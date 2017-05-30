@@ -1,0 +1,243 @@
+% This file was created by matplotlib2tikz v0.6.6.
+\begin{tikzpicture}
+
+\definecolor{color1}{rgb}{0,0.75,0.75}
+\definecolor{color0}{rgb}{0.75,0,0.75}
+
+\begin{axis}[
+title={Bandwidth for Message Size 8192B},
+ylabel={Bandwidth \si{\mega\byte\per\second}},
+xmin=-1.74875, xmax=12.38625,
+ymin=24.3351911340897, ymax=6009.34899562563,
+ymode=log,
+width=\figurewidth,
+height=\figureheight,
+xtick={-0.68125,0.31875,1.31875,2.31875,3.31875,4.31875,5.31875,6.31875,7.31875,8.31875,9.31875,10.31875,11.31875},
+xticklabels={Cloud,scarf10,scarf11,scarf12,scarf13,scarf14,scarf15,scarf16,broadwell256G,haswell256G,ivybridge128G,ivybridge2000G,ivybridge512G},
+ytick={1,10,100,1000,10000,100000},
+yticklabels={,,${10^{2}}$,${10^{3}}$,,},
+tick align=outside,
+xticklabel style = {rotate=60},
+xmajorticks=false,
+ytick pos=left,
+x grid style={lightgray!92.026143790849673!black},
+y grid style={lightgray!92.026143790849673!black},
+legend style={at={(0.97,0.03)}, anchor=south east, draw=white!80.0!black},
+legend entries={{IBV},{SHM-2},{SHM-1},{TCP}},
+legend cell align={left}
+]
+\addlegendimage{ybar,ybar legend,fill=blue,draw opacity=0};
+\draw[fill=blue,draw opacity=0] (axis cs:-1.10625,0) rectangle (axis cs:-0.89375,0);
+\draw[fill=blue,draw opacity=0] (axis cs:-0.10625,0) rectangle (axis cs:0.10625,468.494);
+\draw[fill=blue,draw opacity=0] (axis cs:0.89375,0) rectangle (axis cs:1.10625,913.838);
+\draw[fill=blue,draw opacity=0] (axis cs:1.89375,0) rectangle (axis cs:2.10625,935.66);
+\draw[fill=blue,draw opacity=0] (axis cs:2.89375,0) rectangle (axis cs:3.10625,579.114);
+\draw[fill=blue,draw opacity=0] (axis cs:3.89375,0) rectangle (axis cs:4.10625,822.416);
+\draw[fill=blue,draw opacity=0] (axis cs:4.89375,0) rectangle (axis cs:5.10625,988.264);
+\draw[fill=blue,draw opacity=0] (axis cs:5.89375,0) rectangle (axis cs:6.10625,1122.512);
+\draw[fill=blue,draw opacity=0] (axis cs:6.89375,0) rectangle (axis cs:7.10625,0);
+\draw[fill=blue,draw opacity=0] (axis cs:7.89375,0) rectangle (axis cs:8.10625,0);
+\draw[fill=blue,draw opacity=0] (axis cs:8.89375,0) rectangle (axis cs:9.10625,0);
+\draw[fill=blue,draw opacity=0] (axis cs:9.89375,0) rectangle (axis cs:10.10625,0);
+\draw[fill=blue,draw opacity=0] (axis cs:10.89375,0) rectangle (axis cs:11.10625,0);
+\addlegendimage{ybar,ybar legend,fill=color0,draw opacity=0};
+\draw[fill=color0,draw opacity=0] (axis cs:-0.89375,0) rectangle (axis cs:-0.68125,2331.777);
+\draw[fill=color0,draw opacity=0] (axis cs:0.10625,0) rectangle (axis cs:0.31875,2269.976);
+\draw[fill=color0,draw opacity=0] (axis cs:1.10625,0) rectangle (axis cs:1.31875,2559.634);
+\draw[fill=color0,draw opacity=0] (axis cs:2.10625,0) rectangle (axis cs:2.31875,2601.344);
+\draw[fill=color0,draw opacity=0] (axis cs:3.10625,0) rectangle (axis cs:3.31875,1891.894);
+\draw[fill=color0,draw opacity=0] (axis cs:4.10625,0) rectangle (axis cs:4.31875,2005.548);
+\draw[fill=color0,draw opacity=0] (axis cs:5.10625,0) rectangle (axis cs:5.31875,2563.464);
+\draw[fill=color0,draw opacity=0] (axis cs:6.10625,0) rectangle (axis cs:6.31875,2568.836);
+\draw[fill=color0,draw opacity=0] (axis cs:7.10625,0) rectangle (axis cs:7.31875,2204.372);
+\draw[fill=color0,draw opacity=0] (axis cs:8.10625,0) rectangle (axis cs:8.31875,1752.092);
+\draw[fill=color0,draw opacity=0] (axis cs:9.10625,0) rectangle (axis cs:9.31875,2106.112);
+\draw[fill=color0,draw opacity=0] (axis cs:10.10625,0) rectangle (axis cs:10.31875,1514.618);
+\draw[fill=color0,draw opacity=0] (axis cs:11.10625,0) rectangle (axis cs:11.31875,1983.108);
+\addlegendimage{ybar,ybar legend,fill=color1,draw opacity=0};
+\draw[fill=color1,draw opacity=0] (axis cs:-0.68125,0) rectangle (axis cs:-0.46875,2331.777);
+\draw[fill=color1,draw opacity=0] (axis cs:0.31875,0) rectangle (axis cs:0.53125,3786.752);
+\draw[fill=color1,draw opacity=0] (axis cs:1.31875,0) rectangle (axis cs:1.53125,4266.714);
+\draw[fill=color1,draw opacity=0] (axis cs:2.31875,0) rectangle (axis cs:2.53125,4399.958);
+\draw[fill=color1,draw opacity=0] (axis cs:3.31875,0) rectangle (axis cs:3.53125,3153.468);
+\draw[fill=color1,draw opacity=0] (axis cs:4.31875,0) rectangle (axis cs:4.53125,3735.094);
+\draw[fill=color1,draw opacity=0] (axis cs:5.31875,0) rectangle (axis cs:5.53125,2513.02);
+\draw[fill=color1,draw opacity=0] (axis cs:6.31875,0) rectangle (axis cs:6.53125,2566.256);
+\draw[fill=color1,draw opacity=0] (axis cs:7.31875,0) rectangle (axis cs:7.53125,4615.698);
+\draw[fill=color1,draw opacity=0] (axis cs:8.31875,0) rectangle (axis cs:8.53125,3248.41);
+\draw[fill=color1,draw opacity=0] (axis cs:9.31875,0) rectangle (axis cs:9.53125,3794.902);
+\draw[fill=color1,draw opacity=0] (axis cs:10.31875,0) rectangle (axis cs:10.53125,3479.324);
+\draw[fill=color1,draw opacity=0] (axis cs:11.31875,0) rectangle (axis cs:11.53125,3784.998);
+\addlegendimage{ybar,ybar legend,fill=green!50.0!black,draw opacity=0};
+\draw[fill=green!50.0!black,draw opacity=0] (axis cs:-0.46875,0) rectangle (axis cs:-0.25625,70.8153333333333);
+\draw[fill=green!50.0!black,draw opacity=0] (axis cs:0.53125,0) rectangle (axis cs:0.74375,39.924);
+\draw[fill=green!50.0!black,draw opacity=0] (axis cs:1.53125,0) rectangle (axis cs:1.74375,45.962);
+\draw[fill=green!50.0!black,draw opacity=0] (axis cs:2.53125,0) rectangle (axis cs:2.74375,45.632);
+\draw[fill=green!50.0!black,draw opacity=0] (axis cs:3.53125,0) rectangle (axis cs:3.74375,32.814);
+\draw[fill=green!50.0!black,draw opacity=0] (axis cs:4.53125,0) rectangle (axis cs:4.74375,33.336);
+\draw[fill=green!50.0!black,draw opacity=0] (axis cs:5.53125,0) rectangle (axis cs:5.74375,318.38);
+\draw[fill=green!50.0!black,draw opacity=0] (axis cs:6.53125,0) rectangle (axis cs:6.74375,233.964);
+\draw[fill=green!50.0!black,draw opacity=0] (axis cs:7.53125,0) rectangle (axis cs:7.74375,352.734);
+\draw[fill=green!50.0!black,draw opacity=0] (axis cs:8.53125,0) rectangle (axis cs:8.74375,289.126);
+\draw[fill=green!50.0!black,draw opacity=0] (axis cs:9.53125,0) rectangle (axis cs:9.74375,235.512);
+\draw[fill=green!50.0!black,draw opacity=0] (axis cs:10.53125,0) rectangle (axis cs:10.74375,188.944);
+\draw[fill=green!50.0!black,draw opacity=0] (axis cs:11.53125,0) rectangle (axis cs:11.74375,295.25);
+\path [draw=black, semithick] (axis cs:-1,0)
+--(axis cs:-1,0);
+
+\path [draw=black, semithick] (axis cs:0,465.9)
+--(axis cs:0,472.75);
+
+\path [draw=black, semithick] (axis cs:1,903.28)
+--(axis cs:1,929.73);
+
+\path [draw=black, semithick] (axis cs:2,924.5)
+--(axis cs:2,952.52);
+
+\path [draw=black, semithick] (axis cs:3,564.18)
+--(axis cs:3,595.31);
+
+\path [draw=black, semithick] (axis cs:4,807.87)
+--(axis cs:4,862.41);
+
+\path [draw=black, semithick] (axis cs:5,937.03)
+--(axis cs:5,1016.2);
+
+\path [draw=black, semithick] (axis cs:6,1114.48)
+--(axis cs:6,1129.64);
+
+\path [draw=black, semithick] (axis cs:7,0)
+--(axis cs:7,0);
+
+\path [draw=black, semithick] (axis cs:8,0)
+--(axis cs:8,0);
+
+\path [draw=black, semithick] (axis cs:9,0)
+--(axis cs:9,0);
+
+\path [draw=black, semithick] (axis cs:10,0)
+--(axis cs:10,0);
+
+\path [draw=black, semithick] (axis cs:11,0)
+--(axis cs:11,0);
+
+\path [draw=black, semithick] (axis cs:-0.7875,1334.66)
+--(axis cs:-0.7875,3421.35);
+
+\path [draw=black, semithick] (axis cs:0.2125,2234.44)
+--(axis cs:0.2125,2303.87);
+
+\path [draw=black, semithick] (axis cs:1.2125,2529.08)
+--(axis cs:1.2125,2603.32);
+
+\path [draw=black, semithick] (axis cs:2.2125,2589.03)
+--(axis cs:2.2125,2624.8);
+
+\path [draw=black, semithick] (axis cs:3.2125,1880.03)
+--(axis cs:3.2125,1898.55);
+
+\path [draw=black, semithick] (axis cs:4.2125,1998.84)
+--(axis cs:4.2125,2014.32);
+
+\path [draw=black, semithick] (axis cs:5.2125,2493.19)
+--(axis cs:5.2125,2587.8);
+
+\path [draw=black, semithick] (axis cs:6.2125,2539.86)
+--(axis cs:6.2125,2582.29);
+
+\path [draw=black, semithick] (axis cs:7.2125,2143.94)
+--(axis cs:7.2125,2306.31);
+
+\path [draw=black, semithick] (axis cs:8.2125,1633.74)
+--(axis cs:8.2125,1832.87);
+
+\path [draw=black, semithick] (axis cs:9.2125,2054.03)
+--(axis cs:9.2125,2131.04);
+
+\path [draw=black, semithick] (axis cs:10.2125,1496.63)
+--(axis cs:10.2125,1532.04);
+
+\path [draw=black, semithick] (axis cs:11.2125,1933.1)
+--(axis cs:11.2125,2022.65);
+
+\path [draw=black, semithick] (axis cs:-0.575,1334.66)
+--(axis cs:-0.575,3421.35);
+
+\path [draw=black, semithick] (axis cs:0.425,3763.19)
+--(axis cs:0.425,3822.01);
+
+\path [draw=black, semithick] (axis cs:1.425,4227.58)
+--(axis cs:1.425,4299.7);
+
+\path [draw=black, semithick] (axis cs:2.425,4363.25)
+--(axis cs:2.425,4446.43);
+
+\path [draw=black, semithick] (axis cs:3.425,3125.67)
+--(axis cs:3.425,3162.32);
+
+\path [draw=black, semithick] (axis cs:4.425,3705.32)
+--(axis cs:4.425,3787.99);
+
+\path [draw=black, semithick] (axis cs:5.425,2363.87)
+--(axis cs:5.425,2656.83);
+
+\path [draw=black, semithick] (axis cs:6.425,2328.68)
+--(axis cs:6.425,2663.2);
+
+\path [draw=black, semithick] (axis cs:7.425,4543.54)
+--(axis cs:7.425,4678.14);
+
+\path [draw=black, semithick] (axis cs:8.425,3150.16)
+--(axis cs:8.425,3318.78);
+
+\path [draw=black, semithick] (axis cs:9.425,3768.6)
+--(axis cs:9.425,3869.63);
+
+\path [draw=black, semithick] (axis cs:10.425,3428.15)
+--(axis cs:10.425,3520.79);
+
+\path [draw=black, semithick] (axis cs:11.425,3755.21)
+--(axis cs:11.425,3877.18);
+
+\path [draw=black, semithick] (axis cs:-0.3625,58.13)
+--(axis cs:-0.3625,82.72);
+
+\path [draw=black, semithick] (axis cs:0.6375,31.26)
+--(axis cs:0.6375,44.72);
+
+\path [draw=black, semithick] (axis cs:1.6375,43.75)
+--(axis cs:1.6375,47.48);
+
+\path [draw=black, semithick] (axis cs:2.6375,43.77)
+--(axis cs:2.6375,47.09);
+
+\path [draw=black, semithick] (axis cs:3.6375,31.76)
+--(axis cs:3.6375,34.03);
+
+\path [draw=black, semithick] (axis cs:4.6375,32.17)
+--(axis cs:4.6375,34.61);
+
+\path [draw=black, semithick] (axis cs:5.6375,311.32)
+--(axis cs:5.6375,322.93);
+
+\path [draw=black, semithick] (axis cs:6.6375,221.94)
+--(axis cs:6.6375,244.81);
+
+\path [draw=black, semithick] (axis cs:7.6375,293.37)
+--(axis cs:7.6375,421.93);
+
+\path [draw=black, semithick] (axis cs:8.6375,257.29)
+--(axis cs:8.6375,337.83);
+
+\path [draw=black, semithick] (axis cs:9.6375,225.96)
+--(axis cs:9.6375,247.97);
+
+\path [draw=black, semithick] (axis cs:10.6375,158.3)
+--(axis cs:10.6375,210.96);
+
+\path [draw=black, semithick] (axis cs:11.6375,266.01)
+--(axis cs:11.6375,320.65);
+
+\end{axis}
+
+\end{tikzpicture}
