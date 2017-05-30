@@ -633,14 +633,14 @@ echo $(($(cat $COUNT) + 1)) > $COUNT
                 \centering
                 \includegraphics[width=\textwidth]{compare_latency-hostgroup}
                 \caption{Comparison of latencies over different infrastructures and interconnects. The mean of repeats for each combination is shown along with error bars for the range of repeats (See Appendix \ref{appendix:latency-data} for data).}
-                \label{fig:compare-latency}
+                \label{fig:compare_latency-hostgroup}
             \end{figure}
 
             \paragraph{}
-            The location of the processes has a clear impact on latency (see Figure \ref{fig:compare-latency}). Even ignoring the impact of host group, all the mean results for each host group for SHM-1 are lower than SHM-2 which are lower than IBV which are lower than TCP. The closer the processes, the lower the latency.
+            The method of communication has a clear impact on latency (see Figure \ref{fig:compare_latency-hostgroup}). Even ignoring the impact of host group, all the mean results for each host group for SHM-1 are lower than SHM-2 which are lower than IBV which are lower than TCP. As the processes need to communicate further, latency rises.
 
             \paragraph{}
-            The effect of newer hardware is less clear. Over TCP, SCARF latencies broadly reduce as hardware improves from 10 to 16. Certainly scarf15's \SI{9.70}{\micro\second} is an improvement on scarf10's \SI{89.49}{\micro\second}. But the results for Infiniband remain mainly constant except for scarf13 which is significantly higher. Within the host (SHM-1 and SHM-2), SCARF hardware tends to get higher latencies with more recent hardware on scarf15/16 the highest for both. The latency results for LOTUS does not seem to depend as significantly on the hardware with all host groups performing similarly although the Broadwell hosts do have notably lower latencies on all three.
+            The effect of newer hardware is less clear. Over TCP, SCARF latencies broadly reduce as hardware improves from scarf10 to scarf16. Certainly scarf15's \SI{9.70}{\micro\second} is an improvement on \SI{89.49}{\micro\second} for scarf10. But the results for Infiniband remain mainly constant except for scarf13 which is significantly higher. Within the host, improving hardware has minimal effect on latency with all SCARF/LOTUS host groups at roughly \SI{0.75}{\micro\second} for SHM-1 and \SI{0.3}{\micro\second} for SHM-2. The latency results for LOTUS does not seem to depend as significantly on the hardware with all host groups performing similarly.
 
             \paragraph{}
             The Cloud manages to compete with some of the older SCARF hosts (10, 11, 12) over TCP. Without knowing the CPU mapping, it has similar results to the other systems between two CPUs although the other systems have lower latencies when processes are on the same CPU.
@@ -653,15 +653,15 @@ echo $(($(cat $COUNT) + 1)) > $COUNT
                 \begin{subfigure}{\textwidth}
                   \centering
                     \includegraphics[width=\textwidth]{compare_bandwidth-hostgroup_1024}
-                  \caption{TODO}
+                  \caption{1024\si{\byte} messages}
                 \end{subfigure}
 
                 \begin{subfigure}{\textwidth}
                   \centering
                      \includegraphics[width=\textwidth]{compare_bandwidth-hostgroup_8192}
-                  \caption{TODO}
+                  \caption{8192\si{\byte} messages}
                 \end{subfigure}
-                \caption{OVERALL CAPTION TODO (H?)}
+                %\caption{}
              \end{figure}
 
              \begin{figure}[H]\ContinuedFloat
@@ -669,15 +669,17 @@ echo $(($(cat $COUNT) + 1)) > $COUNT
                 \begin{subfigure}{\textwidth}
                   \centering
                     \includegraphics[width=\textwidth]{compare_bandwidth-hostgroup_32768}
-                  \caption{TODO}
+                  \caption{32768\si{\byte} messages}
                 \end{subfigure}
 
                 \begin{subfigure}{\textwidth}
                   \centering
                     \includegraphics[width=\textwidth]{compare_bandwidth-hostgroup_max}
-                  \caption{TODO}
+
+                  \caption{Max bandwidth over all message sizes}
                 \end{subfigure}
-                \caption{OVERALL CAPTION TODO }
+                \caption{Comparison of bandwidths between hostgroups and protocols at different message sizes. Each bar shows the mean over the repeats with the range bars showing the range.}
+                \label{fig:compare_bandwidth-hostgroup_max}
              \end{figure}
 
 
@@ -686,7 +688,7 @@ echo $(($(cat $COUNT) + 1)) > $COUNT
             \label{analyse-results-imb-bandwidth}
 
             \paragraph{}
-            Figure TODO, TODO, TODO and TODO show a comparison of the results for bandwidth (see \ref{appendix:bandwidth-data} for the data).
+            Figure \ref{fig:compare_bandwidth-hostgroup_max} shows a comparison of the results for bandwidth (see \ref{appendix:bandwidth-data} for the data).
 
             \paragraph{}
             The first point to note is that for each message size on each host group, the order of bandwidths is the same: SHM with one CPU, SHM between two CPUs, IBV and then TCP. This is expected as data transfer between CPUs or hosts is generally slower than travelling within them.
@@ -973,7 +975,7 @@ End of Tests.
              \hline
             \end{tabular}
             \captionsetup{type=table}
-            \caption{The mean latency over all repeats, split by hostgroup as shown in figure TODO}
+            \caption{The mean latency over all repeats, split by hostgroup as shown in Figure \ref{fig:compare_latency-hostgroup}}
         \end{center}
 
 
@@ -983,6 +985,8 @@ End of Tests.
 
     \subsection{Bandwidth Data}
         \label{appendix:bandwidth-data}
+
+        The following data is for the four charts in Figure \ref{fig:compare_bandwidth-hostgroup_max}.
 
         \begin{center}
             \centering
@@ -1008,7 +1012,7 @@ End of Tests.
              \hline
             \end{tabular}
             \captionsetup{type=table}
-            \caption{The mean bandwidth for the 1024B messages split by hostgroup as shown in figure TODO}
+            \caption{The mean bandwidth for the 1024B messages split by hostgroup}
         \end{center}
 
          \begin{center}
@@ -1035,7 +1039,7 @@ End of Tests.
              \hline
             \end{tabular}
             \captionsetup{type=table}
-            \caption{The mean bandwidth for the 8192B messages split by hostgroup as shown in figure TODO}
+            \caption{The mean bandwidth for the 8192B messages split by hostgroup}
         \end{center}
 
          \begin{center}
@@ -1062,7 +1066,7 @@ End of Tests.
              \hline
             \end{tabular}
             \captionsetup{type=table}
-            \caption{The mean bandwidth for the 32768B messages split by hostgroup as shown in figure TODO}
+            \caption{The mean bandwidth for the 32768B messages split by hostgroup}
         \end{center}
 
          \begin{center}
@@ -1090,7 +1094,7 @@ End of Tests.
              \hline
             \end{tabular}
             \captionsetup{type=table}
-            \caption{The mean of the max bandwidth over all message sizes for each hostgroup as shown in figure TODO}
+            \caption{The mean of the max bandwidth over all message sizes for each hostgroup }
         \end{center}
 
 \end{document}
