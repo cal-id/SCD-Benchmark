@@ -97,7 +97,7 @@ This is the abstract which is definitely TODO!
     There are two benchmarking applications to run on each system.
 
     \begin{description}
-        \item[IMB PingPong] uses MPI to send messages of increasing size both ways between two processes \cite{intel2016}. Latency can be recorded as the average time for the message of zero size to cross one way between the two processes. Bandwidth can be recorded as the rate of throughput at different message sizes. The only dependency to run this benchmark is an MPI library.
+        \item[IMB PingPong] uses MPI to send messages of increasing size both ways between two processes \cite{intel2016}. Latency is the average time for the message of zero size to cross one way between the two processes. Bandwidth is the rate of throughput at different message sizes. The only dependency to run this benchmark is an MPI library.
         \item[HPL TOP500] solves a large matrix problem over distributed compute and memory resources \cite{hpl2016}. The time taken to solve the problem gives a measure of parallel application performance in flops (floating point operations per second). The software relies on a linear algebra library as well as an MPI library.
     \end{description}
 
@@ -239,7 +239,6 @@ done
 
                 \end{minted}
                 \end{code}
-                \item This will create \verb|.err| and \verb|.out| files for each run of the benchmark under a directory \verb|outputs/|.
             \end{enumerate}
         \subsubsection{LOTUS}
             The method for running IMB PingPong on LOTUS is similar but there is no Infiniband available and there is a different \verb|mpirun| command.
@@ -279,7 +278,6 @@ mpirun.lotus -prot $PWD/imb/imb/src/IMB-MPI1 -iter 1000 -time 200 -msglog 0:24 -
 done
                     \end{minted}
                     \end{code}
-                \item This creates the same \verb|.out| and \verb|.err| files as above.
             \end{enumerate}
         \subsubsection{Cloud}
 
@@ -347,7 +345,6 @@ echo $(($(cat $COUNT) + 1)) > $COUNT
                     \begin{minted}{bash}
 05,25,45 * * * * /home/tan49775/Cloud_IMB/run_IMB_Cloud.sh
                     \end{minted}
-                \item Again, similar output files are produced.
             \end{enumerate}
 
         \subsubsection{Interpreting Results}
@@ -388,7 +385,7 @@ echo $(($(cat $COUNT) + 1)) > $COUNT
             \item Create a top directory (e.g. \verb|/home/cseg/scarf656/SCARF_HPL|) and \verb|cd| into it.
             \item Run \mintinline{bash}{bsub -m scarf10 "cp /apps/procspec/hpl/2.2/bin/Linux_Intel64/xhpl ."} to copy the SCARF10 precompiled HPL binary into this directory.
             \item Copy in \verb|HPL.dat| from Appendix \ref{appendix:hpl-conf}.
-            \item Submit jobs to run the benchmark for five repeats across each host group. For each host group, run the benchmark between two hosts using TCP and using Infiniband, and on the same host. Use Code \ref{code:tests-scarf_hpl-runhplscarf-sh} from inside the top directory.
+            \item Submit jobs to run the benchmark for five repeats across each host group. For each host group, run the benchmark between two hosts using TCP and Infiniband, and on the same host. Use Code \ref{code:tests-scarf_hpl-runhplscarf-sh} from inside the top directory.
 
 
             \begin{code}
@@ -432,7 +429,6 @@ mpirun -lsf -prot $pFlag $PWD/xhpl
 done
             \end{minted}
             \end{code}
-            \item Output and error files are placed into a sub-directory \verb|outputs| for analysis.
         \end{enumerate}
 
 
@@ -483,7 +479,6 @@ mpirun.lotus -e LD_LIBRARY_PATH=\$LD_LIBRARY_PATH -prot /apps/src/hpl/hpl-2.2/bi
 done
             \end{minted}
             \end{code}
-            \item Output and error files are placed into a sub-directory \verb|outputs| for analysis.
         \end{enumerate}
 
 
@@ -549,7 +544,7 @@ echo $(($(cat $COUNT) + 1)) > $COUNT
                     \begin{minted}{bash}
 50 * * * * /home/tan49775/Cloud_HPL/run_HPL_Cloud_2Nodes.sh
                     \end{minted}
-                \item Copy the output files to a safe place and reinstall the machine as a single VM with 4CPUs and 20GB of RAM.
+                \item Copy the output files off the machine and reinstall the machine as a single VM with 4CPUs and 20GB of RAM.
 
                 \item \label{item:cloud-hpl-one-vm} Repeat steps \ref{item:cloud-hpl-repeat-start} to \ref{item:cloud-hpl-repeat-end} above, removing the flags causing it to run over two nodes.
 
@@ -568,11 +563,12 @@ echo $(($(cat $COUNT) + 1)) > $COUNT
     \paragraph{} The plain text output files for each run were saved parsed for the data. This section presents the results and explains any adaptions to the method after the initial results.
 
     \paragraph{}
-    Note that some LOTUS benchmarks were submitted to LSF differently. For all jobs on 'ivybridge2000G' and 3 HPL on 'ivybridge512G' over two hosts, the jobs were waiting for weeks without being run. Instead, a host reservation was used - removing the \mintinline{bash}{-m} parameter and adding a \mintinline{bash}{-U}. The different bsub parameters should have had no effect on the results as they only define how the job is submitted - all benchmarks were run exclusively.
+    Note that some LOTUS benchmarks were submitted to LSF differently. For all jobs on 'ivybridge2000G' and three HPL runs on 'ivybridge512G' over two hosts, the jobs were waiting for weeks without being run. Instead, a host reservation was used - removing the \mintinline{bash}{-m} parameter and adding a \mintinline{bash}{-U}. The different bsub parameters should have had no effect on the results as they only define how the job is submitted - all benchmarks were run exclusively.
 
     \subsection{IMB PingPong}
 
         \subsubsection{SHM first look and adaptions to method}
+            \label{subsubsection:SHM-first-look}
             \begin{figure}[ht]
                 \centering
                 \begin{subfigure}{.5\textwidth}
@@ -636,8 +632,10 @@ echo $(($(cat $COUNT) + 1)) > $COUNT
                 \label{fig:compare_latency-hostgroup}
             \end{figure}
 
+            \paragraph{} Figure \ref{fig:compare_latency-hostgroup} shows the latencies for different options compared over a log scale. After the adaptions in Section \ref{subsubsection:SHM-first-look}, SHM has now been split into SHM-1 and SHM-2 indicating the number of CPUs used.
+
             \paragraph{}
-            The method of communication has a clear impact on latency (see Figure \ref{fig:compare_latency-hostgroup}). Even ignoring the impact of host group, all the mean results for each host group for SHM-1 are lower than SHM-2 which are lower than IBV which are lower than TCP. As the processes need to communicate further, latency rises.
+            Latency is mainly affected by the method of communication. Even ignoring the impact of host group, the mean results for each run over SHM-1 are lower than SHM-2 which are lower than IBV which are lower than TCP. As the processes need to communicate further, between nodes rather than within nodes, latency rises. Certainly on SCARF where direct comparison is possible, IBV is lower latency than TCP.
 
             \paragraph{}
             The effect of newer hardware is less clear. Over TCP, SCARF latencies broadly reduce as hardware improves from scarf10 to scarf16. Certainly scarf15's \SI{9.70}{\micro\second} is an improvement on \SI{89.49}{\micro\second} for scarf10. But the results for Infiniband remain mainly constant except for scarf13 which is significantly higher. Within the host, improving hardware has minimal effect on latency with all SCARF/LOTUS host groups at roughly \SI{0.75}{\micro\second} for SHM-1 and \SI{0.3}{\micro\second} for SHM-2. The latency results for LOTUS does not seem to depend as significantly on the hardware with all host groups performing similarly.
