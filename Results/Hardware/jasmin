@@ -1,0 +1,30 @@
+broadwell256G
+L1d (32KB)
+L1i (32KB)
+L2 (256KB)
+L3 (25MB)
+----
+haswell256G
+L1d (32KB)
+L1i (32KB)
+L2 (256KB)
+L3 (25MB)
+----
+ivybridge128G
+L1d (32KB)
+L1i (32KB)
+L2 (256KB)
+L3 (20MB)
+----
+ivybridge2000G
+L1d (32KB)
+L1i (32KB)
+L2 (256KB)
+L3 (30MB)
+----
+ivybridge512G
+L1d (32KB)
+L1i (32KB)
+L2 (256KB)
+L3 (20MB)
+----
