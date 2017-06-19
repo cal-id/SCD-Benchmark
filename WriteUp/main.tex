@@ -186,12 +186,12 @@ gmake all CC=mpicc
         \subsubsection{Configuration}
 
         \paragraph{}
-        There is no configuration file required for the IMB benchmarks but a number of command line options are available.
+        IMB is configured by command line parameters.
 
         \begin{description}
             \item[iter n] ensures that \verb|n| repeats of each message size are taken and averaged. 1000 was chosen because it was the largest number of repeats that maintained a reasonable time to run on the slowest infrastructure (Cloud, between two VMs). It was also the default for smaller message sizes.
             \item[time t] sets a maximum time \verb|t|(s) for all repeats of a message size. 200 was chosen because it is significantly high such that this maximum was never reached.
-            \item[msglog a:b] sets a minimum and maximum ($2^{a}$, $2^{b}$ respectively) for the message sizes.
+            \item[msglog a:b] sets a minimum and maximum ($2^{a}$, $2^{b}$) for the message sizes.
             \item[iter\_policy] sets the behaviour with large message sizes and whether to reduce the number of repeats. Given that the number of repeats is feasible, setting this to \verb|off| means that the same number of repeats are tested for each message size.
         \end{description}
 
@@ -285,7 +285,7 @@ done
             Two virtual machines are required to run IMB PingPong. The main VM (where the job is initialised from) must have at least two cores. This allows running the benchmark between two VMs and on just the main VM without re-installation.
 
             \paragraph{}
-            Using \url{http://mimic.gridpp.rl.ac.uk/}, under the \verb|Cloud -> Open Nebula| section, find the VMs and ensure that they are on different hypervisors (by clicking for more information).
+            Using \url{http://mimic.gridpp.rl.ac.uk/}, under \verb|Cloud -> Open Nebula|, find the VMs and ensure that they are on different hypervisors (by clicking for more information).
 
             \begin{enumerate}
                 \item Install IMB PingPong in the home directory of both VMs and setup SSH as in section \ref{cloud-installation}.
@@ -339,7 +339,6 @@ mpirun -np 2 $multiHostFlags $HOME_DIR/imb/imb/src/IMB-MPI1 -iter 1000 -msglog 0
 echo $(($(cat $COUNT) + 1)) > $COUNT
                     \end{minted}
                     \end{code}
-                \item Make the script executable using \mintinline{bash}{chmod 755 run_IMB_Cloud.sh}.
                 \item Setup a crontab to run the script at 20 minute intervals.
 
                     \begin{minted}{bash}
@@ -358,24 +357,24 @@ echo $(($(cat $COUNT) + 1)) > $COUNT
 
     \subsection{Running HPL}
         \paragraph{}
-        Similarly to running IMB, shell scripts are used with cron or LSF for each setup to submit the necessary repeats and apply platform parameters. This time there is a configuration file.
+        Similarly to running IMB, shell scripts are used with cron or LSF for each setup to submit the necessary repeats and apply platform parameters.
 
         \subsubsection{Configuration}
             \paragraph{}
-            HPL uses a configuration file to specify the problem size and the computational parameters (how to split the matrix and what functions to use). On execution, it looks in the working directory and reads from \verb|HPL.dat|. The full file used is included in Appendix \ref{appendix:hpl-conf}.
+            HPL uses a configuration file to specify the problem size and the computational parameters (how to split the matrix and what functions to use). On execution, it looks in the working directory and reads from \verb|HPL.dat|. The same configuration (Appendix \ref{appendix:hpl-conf}) was used in all tests so that the results can be compared.
 
 
             \paragraph{}
-            The first parameter to choose is the number of cores to use when running the benchmark. The same number should be chosen for LOTUS, SCARF and the Cloud to allow comparison. The Cloud has a limit of 5 cores per user (split across as many VMs) which specifies an upper bound. The parameters \verb|P| and \verb|Q| should be approximately equal and \verb|P| multiplied by \verb|Q| is the number of processors. To avoid \verb|P| or \verb|Q| being 1, 2 was chosen for both values giving a total of 4 cores. To balance across hosts, measurements were taken with four cores from the same node and with two cores on each node.
+            The first parameter is the number of cores to use when running the benchmark. The Cloud has a limit of 5 cores per user (split across as many VMs) which specifies an upper bound. The parameters \verb|P| and \verb|Q| should be approximately equal and \verb|P| multiplied by \verb|Q| is the number of processors. To avoid \verb|P| or \verb|Q| being 1, 2 was chosen for both values giving a total of 4 cores. To balance across hosts, measurements were taken with four cores from the same node and with two cores on each node.
 
             \paragraph{}
             Some initial tests were done across the infrastructures to choose a value of \verb|NB| (the block size) that was reasonably well performing with respect to other values in the default interval [32, 256]. However, care was taken to avoid tuning this value to a particular system and these initial tests were only to confirm that it was not a poor choice for any setup. 180 was used.
 
             \paragraph{}
-            The main parameter is 'problem size' (\verb|N|)  which is the side length of the matrix to be solved. According to \cite{hpl2016}, the largest size that will fit in memory is recommended. The Cloud limits users to 20GB of memory so this was used as an upper bound. Each element in the matrix is a double precision float (8 bytes). This means that a total of $2.5 \times 10 ^ 9$ elements can be used. Using the recommend 80\% figure (to leave room for the OS), this gives a side length of around 44721. It is also beneficial to have a multiple of NB so 44640 was chosen.
+            The main parameter is 'problem size' (\verb|N|)  which is the side length of the matrix to be solved. According to \cite{hpl2016}, the largest size that will fit in memory is recommended. The Cloud limits users to 20GB of memory and each element in the matrix is a double precision float (8 bytes). This means that a total of $2.5 \times 10 ^ 9$ elements can be used. Using the recommend 80\% figure (to leave room for the OS), this gives a side length of around 44721. It is also beneficial to have a multiple of NB so 44640 was used.
 
             \paragraph{}
-            Provided the same file is used for each test (to an extent) the content of this file is insignificant - it will still provide a comparison of parallel application performance. Where possible, advice in the "FAQ" and "tuning" sections of \cite{hpl2016} was followed, using default or suggested values to attempt to remain neutral. Of course, it would be possible to tune this configuration file for each setup and achieve some faster speeds but this would likely be at the expense of other setups and introduce a bias. Any case where there was no default value given is justified above.
+            Provided the same file is used for each test (to an extent) the content of this file is insignificant - it will still provide a comparison of parallel application performance. Where possible, advice in the "FAQ" and "tuning" sections of \cite{hpl2016} was followed, using default or suggested values to attempt to remain neutral. Of course, it would be possible to tune this configuration for each setup and achieve some faster speeds but this would likely be at the expense of other setups and introduce a bias. Any case where there was no default value given is justified above.
 
 
 
@@ -538,13 +537,12 @@ echo $(($(cat $COUNT) + 1)) > $COUNT
                     \end{minted}
                     \end{code}
 
-                \item Make the script executable using \mintinline{bash}{chmod 755 run_HPL_Cloud_2Nodes.sh}.
                 \item \label{item:cloud-hpl-repeat-end} Setup a crontab to run the script at 50 minute intervals.
 
                     \begin{minted}{bash}
 50 * * * * /home/tan49775/Cloud_HPL/run_HPL_Cloud_2Nodes.sh
                     \end{minted}
-                \item Copy the output files off the machine and reinstall the machine as a single VM with 4CPUs and 20GB of RAM.
+                \item Copy the output files off the machine and install a new single VM with 4CPUs and 20GB of RAM.
 
                 \item \label{item:cloud-hpl-one-vm} Repeat steps \ref{item:cloud-hpl-repeat-start} to \ref{item:cloud-hpl-repeat-end} above, removing the flags causing it to run over two nodes.
 
@@ -560,7 +558,7 @@ echo $(($(cat $COUNT) + 1)) > $COUNT
 
 
 \section{Results}
-    \paragraph{} The plain text output files for each run were saved parsed for the data. This section presents the results and explains any adaptions to the method after the initial results.
+    \paragraph{} The data was parsed from the raw output files. This section presents the results and explains any adaptions to the method after the initial results.
 
     \paragraph{}
     Note that some LOTUS benchmarks were submitted to LSF differently. For all jobs on 'ivybridge2000G' and three HPL runs on 'ivybridge512G' over two hosts, the jobs were waiting for weeks without being run. Instead, a host reservation was used - removing the \mintinline{bash}{-m} parameter and adding a \mintinline{bash}{-U}. The different bsub parameters should have had no effect on the results as they only define how the job is submitted - all benchmarks were run exclusively.
@@ -586,7 +584,7 @@ echo $(($(cat $COUNT) + 1)) > $COUNT
             \end{figure}
 
             \paragraph{}
-            Figure \ref{figure:imb-before-cpus} shows the initial results for IMB over SCARF and LOTUS and shared host memory (SHM - between cores on the same host). Each colour represents a different host group (same hardware) and each line is an individual repeat. For each host group, there seems to be two distinct paths rather than one. For example, scarf11 has a bandwidth of roughly \SI{8300}{\mega\byte\per\second} for two repeats but roughly \SI{5200}{\mega\byte\per\second} for the other three at $2^{18}$\si{\byte}. Occasionally (as seen in scarf14) a repeat will begin on the higher path and drop down to the lower (at $2^{17}$ \si{\byte}).
+            Figure \ref{figure:imb-before-cpus} shows the initial results for IMB over SCARF and LOTUS and shared host memory (SHM - between cores on the same host). Each colour represents a different host group (same hardware) and each line is an individual repeat. For each host group, there seems to be two distinct paths rather than one. For example, scarf11 has a bandwidth of roughly \SI{8300}{\mega\byte\per\second} for two repeats but roughly \SI{5200}{\mega\byte\per\second} for the other three at $2^{18}$\si{\byte}. Occasionally (as seen in scarf14) a repeat will begin on the higher path and drop down to the lower (at $2^{17}$\si{\byte}).
 
             \paragraph{}
             A likely explanation is the multiple physical CPUs included in each host. Each host has two or more but the job is submitted without specifying the mapping. The random allocation would create the distinct paths. Without mapping, it may be possible for a job to move from one CPU to two CPUs or vice versa which would lead to the switching behavior in Figure \ref{figure:imb-before-cpus}.
