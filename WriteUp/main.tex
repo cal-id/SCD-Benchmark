@@ -567,6 +567,10 @@ echo $(($(cat $COUNT) + 1)) > $COUNT
 
         \subsubsection{SHM first look and adaptions to method}
             \label{subsubsection:SHM-first-look}
+
+            \paragraph{}
+            After looking at the results, SHM was further divided by CPU mapping where possible (SCARF and LOTUS).
+
             \begin{figure}[ht]
                 \centering
                 \begin{subfigure}{.5\textwidth}
@@ -584,16 +588,10 @@ echo $(($(cat $COUNT) + 1)) > $COUNT
             \end{figure}
 
             \paragraph{}
-            Figure \ref{figure:imb-before-cpus} shows the initial results for IMB over SCARF and LOTUS and shared host memory (SHM - between cores on the same host). Each colour represents a different host group (same hardware) and each line is an individual repeat. For each host group, there seems to be two distinct paths rather than one. For example, scarf11 has a bandwidth of roughly \SI{8300}{\mega\byte\per\second} for two repeats but roughly \SI{5200}{\mega\byte\per\second} for the other three at $2^{18}$\si{\byte}. Occasionally (as seen in scarf14) a repeat will begin on the higher path and drop down to the lower (at $2^{17}$\si{\byte}).
+            Figure \ref{figure:imb-before-cpus} shows the initial results for IMB over SCARF and LOTUS using SHM. Each colour represents a different host group and each line an individual repeat. For each host group, there are two distinct paths rather than one. For example, scarf11 has a bandwidth of roughly \SI{8300}{\mega\byte\per\second} for two repeats but roughly \SI{5200}{\mega\byte\per\second} for the other three at $2^{18}$\si{\byte}. Occasionally (as seen in scarf14 at $2^{17}$\si{\byte}) a repeat will begin on the higher path and drop down to the lower. A likely explanation is the multiple physical CPUs included in each host. The allocation is not set, allowing an SHM job to run with two processes on one CPU or with one process on each. It may be possible for a job to move from one CPU to two CPUs or vice versa which would lead to the switching behavior in Figure \ref{figure:imb-before-cpus}.
 
             \paragraph{}
-            A likely explanation is the multiple physical CPUs included in each host. Each host has two or more but the job is submitted without specifying the mapping. The random allocation would create the distinct paths. Without mapping, it may be possible for a job to move from one CPU to two CPUs or vice versa which would lead to the switching behavior in Figure \ref{figure:imb-before-cpus}.
-
-            \paragraph{}
-            To eliminate this variation and to test if this is actually the cause, the tests were repeated over SHM for SCARF and LOTUS, specifically mapping to one or two CPUs. For one CPU, \mintinline{bash}{numactl --cpunodebind=0 --} was passed as a command line option to the respective \mintinline{bash}{mpirun} command. \mintinline{bash}{-cpu_bind=MAP_CPU:0,15} was used for two. If this is the cause of the variation, the new results should exhibit the same distinction but have a unique path for each mapping. The CPU mapping should remove the jumping between paths.
-
-            \paragraph{}
-            Figure \ref{figure:imb-after-cpus} shows the new results. Similar distinctions between paths in Figure \ref{figure:imb-before-cpus} are shown to be grouped by the CPU mapping.
+            To eliminate this variation and to test if this is actually the cause, the tests were repeated over SHM for SCARF and LOTUS, specifically mapping to one or two CPUs. For one CPU, \mintinline{bash}{numactl --cpunodebind=0 --} was passed to \mintinline{bash}{mpirun} and \mintinline{bash}{-cpu_bind=MAP_CPU:0,15} for two. Figure \ref{figure:imb-after-cpus} shows the new results. The distinct paths in Figure \ref{figure:imb-before-cpus} are grouped by the CPU mapping and there is no longer a switch from one path to another.
 
             \begin{figure}[H]
                 \centering
@@ -626,7 +624,7 @@ echo $(($(cat $COUNT) + 1)) > $COUNT
             \begin{figure}[H]
                 \centering
                 \includegraphics[width=\textwidth]{compare_latency-hostgroup}
-                \caption{Comparison of latencies over different infrastructures and interconnects. The mean of repeats for each combination is shown along with error bars for the range of repeats (See Appendix \ref{appendix:latency-data} for data).}
+                \caption{Comparison of latencies over different infrastructures and interconnects. The mean of repeats for each combination is shown along with error bars for the range of repeats (see Appendix \ref{appendix:latency-data} for data).}
                 \label{fig:compare_latency-hostgroup}
             \end{figure}
 
