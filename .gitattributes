@@ -3,3 +3,7 @@
 *.png binary -text
 *.pdf binary -text
 *.svg binary -text
+
+*.ipynb	diff=jupyternotebook
+
+*.ipynb	merge=jupyternotebook
