@@ -282,7 +282,7 @@ done
         \subsubsection{Cloud}
 
             \paragraph{}
-            Two virtual machines are required to run IMB PingPong. The main VM (where the job is initialised from) must have at least two cores. This allows running the benchmark between two VMs and on just the main VM without re-installation.
+            Two virtual machines are required to run IMB PingPong. The main VM (where the job is initialised from) must have at least two cores.
 
             \paragraph{}
             Using \url{http://mimic.gridpp.rl.ac.uk/}, under \verb|Cloud -> Open Nebula|, find the VMs and ensure that they are on different hypervisors (by clicking for more information).
@@ -610,7 +610,6 @@ echo $(($(cat $COUNT) + 1)) > $COUNT
             \end{figure}
 
             \paragraph{} On the Cloud (Figure \ref{figure:imb-cloud-bandwidth-msgsize}) there is also a potential split between using one or two CPUs; the 11:25 and 13:05 runs on 2017-03-22 are considerably slower than the other runs. Unlike SCARF and LOTUS, there is no way to specify CPU mapping so this can't be tested further. The larger number of repeats should ensure results representative of normal Cloud usage.
-
             \begin{center}
                 \includegraphics[width=\textwidth]{cloud_bandwidth-msgsize_shm}
                 \captionsetup{type=figure}
@@ -621,26 +620,45 @@ echo $(($(cat $COUNT) + 1)) > $COUNT
         \subsubsection{Comparison of Latency}
             \label{analyse-results-imb-latency}
 
+            \paragraph{}
+            The results are compared by method of communication and then by improvements in hardware. The data (Appendix \ref{appendix:latency-data}) is presented as a log plot in Figure \ref{fig:compare_latency-hostgroup}.
+
             \begin{figure}[H]
                 \centering
                 \includegraphics[width=\textwidth]{compare_latency-hostgroup}
-                \caption{Comparison of latencies over different infrastructures and interconnects. The mean of repeats for each combination is shown along with error bars for the range of repeats (see Appendix \ref{appendix:latency-data} for data).}
+                \caption{Comparison of latencies over different infrastructures and interconnects. The mean of the repeats for each combination is shown along with error bars for the range of repeats. After the adaptions in Section \ref{subsubsection:SHM-first-look}, SHM is split into SHM-1 and SHM-2 by the number of CPUs used. On the Cloud, there is no difference between these as the CPU mapping could not be specified and is unknown.}
                 \label{fig:compare_latency-hostgroup}
             \end{figure}
 
-            \paragraph{} Figure \ref{fig:compare_latency-hostgroup} shows the latencies for different options compared over a log scale. After the adaptions in Section \ref{subsubsection:SHM-first-look}, SHM has now been split into SHM-1 and SHM-2 indicating the number of CPUs used.
+            \paragraph{}
+            Latency is mainly affected by the method of communication. Even ignoring the impact of host group, there is a clear ranking: SHM-1, SHM-2, IBV, TCP. As the processes span more interfaces - between nodes rather than within nodes - latency rises. SHM-1 has the lowest latency, perhaps taking advantage of a shared L3 cache and RAM - allowing each process to directly access the MPI shared buffer. With SHM-2, the distinct CPUs have separate L3 caches and rely on 'QuickPath Interconnect' to access memory allocated to the other processor \cite{intel2009}. Establishing the buffer over this additional protocol will add an extra overhead, explaining the greater latency. Similarly, inter-node communication over TCP/IBV adds another layer of protocols and hardware (e.g. switches, network cards), increasing the time to establish a connection. On SCARF (where direct comparison is possible) IBV is lower latency than TCP. This is also the case when comparing with LOTUS; SCARF's highest average latency for a host group (scarf13 at \SI{6.55}{\micro\second}) is smaller than LOTUS's lowest (broadwell256G at \SI{7.17}{\micro\second}).
 
             \paragraph{}
-            Latency is mainly affected by the method of communication. Even ignoring the impact of host group, the mean results for each run over SHM-1 are lower than SHM-2 which are lower than IBV which are lower than TCP. As the processes need to communicate further, between nodes rather than within nodes, latency rises. Certainly on SCARF where direct comparison is possible, IBV is lower latency than TCP.
+            The effect of newer hardware is less clear. Over TCP, SCARF latencies broadly reduce as hardware improves from scarf10 to scarf16. Certainly scarf15's \SI{9.70}{\micro\second} is better than \SI{89.49}{\micro\second} for scarf10. While there was a move from \SI{1}{\giga\byte} to \SI{10}{\giga\byte} Ethernet between scarf14 and scarf15, this can only be part of the explanation because scarf13 and scarf14 also show significantly lower latency than scarf10 with the same Ethernet hardware. The latency results for LOTUS do not depend as significantly on host group with all performing similarly although the newer Broadwell host group (\SI{7.17}{\micro\second}) is lower than the Haswell and Ivybridge host groups (11.05, 11.99 and 10.89 \si{\micro\second} respectively).
 
             \paragraph{}
-            The effect of newer hardware is less clear. Over TCP, SCARF latencies broadly reduce as hardware improves from scarf10 to scarf16. Certainly scarf15's \SI{9.70}{\micro\second} is an improvement on \SI{89.49}{\micro\second} for scarf10. But the results for Infiniband remain mainly constant except for scarf13 which is significantly higher. Within the host, improving hardware has minimal effect on latency with all SCARF/LOTUS host groups at roughly \SI{0.75}{\micro\second} for SHM-1 and \SI{0.3}{\micro\second} for SHM-2. The latency results for LOTUS does not seem to depend as significantly on the hardware with all host groups performing similarly.
+            Despite improvements in hardware, the latency results for IBV and SHM remain mainly constant. Most IBV results are around \SI{2}{\micro\second} with scarf10 (\SI{4.38}{\micro\second}) slightly higher. This is perhaps due to older DDR Infiniband (although the similar upgrade from QDR to FDR after scarf14 did not have a noticeable effect). The results show better hardware having minimal effect on latency inside the node with all SCARF/LOTUS host groups at roughly \SI{0.15}{\micro\second} for SHM-1 and \SI{0.32}{\micro\second} for SHM-2.
 
             \paragraph{}
-            The Cloud manages to compete with some of the older SCARF hosts (10, 11, 12) over TCP. Without knowing the CPU mapping, it has similar results to the other systems between two CPUs although the other systems have lower latencies when processes are on the same CPU.
+            The scarf13 IBV results are significantly higher than the others. To check for an error, the tests were additionally repeated ten times to check a wider variety of hosts but the new results agreed (mean latency \SI{6.36}{\micro\second}).
 
             \paragraph{}
-            The scarf13 Infiniband results were additionally repeated 10 times and there was agreement with these results (mean latency \SI{6.36}{\micro\second}) suggesting these were not anomalous, particularly after a wider variety of hosts have been tested.
+            The Cloud manages to compete with some of the older SCARF hosts (10, 11, 12) over TCP. Without knowing the CPU mapping, it has similar results to the other systems (\SI{0.31}{\micro\second}) between two CPUs.
+
+            \subsubsection{Comparison of Bandwidth}
+            \label{analyse-results-imb-bandwidth}
+
+            \paragraph{}
+            Figure \ref{fig:compare_bandwidth-hostgroup_max} shows a comparison of the results for bandwidth (see Appendix \ref{appendix:bandwidth-data} for the data).
+
+            \paragraph{}
+            In general, for each host group, the ranking of the protocols is the same: SHM-1, SHM-2, IBV and then TCP. In the same way as latency increases, bandwidth TODO
+
+
+            The first point to note is that for each message size on each host group, the order of bandwidths is the same: SHM with one CPU, SHM between two CPUs, IBV and then TCP. This is expected as data transfer between CPUs or hosts is generally slower than travelling within them.
+
+            Infiniband is seen as the faster (and default) networking option on SCARF.
+
 
              \begin{figure}[H]
                 \centering
@@ -678,16 +696,7 @@ echo $(($(cat $COUNT) + 1)) > $COUNT
 
 
 
-        \subsubsection{Comparison of Bandwidth}
-            \label{analyse-results-imb-bandwidth}
 
-            \paragraph{}
-            Figure \ref{fig:compare_bandwidth-hostgroup_max} shows a comparison of the results for bandwidth (see \ref{appendix:bandwidth-data} for the data).
-
-            \paragraph{}
-            The first point to note is that for each message size on each host group, the order of bandwidths is the same: SHM with one CPU, SHM between two CPUs, IBV and then TCP. This is expected as data transfer between CPUs or hosts is generally slower than travelling within them.
-
-            Infiniband is seen as the faster (and default) networking option on SCARF.
 
 
 
@@ -948,7 +957,7 @@ End of Tests.
             \centering
             \begin{tabular}{ |c||c|c|c|c|  }
              \hline
-             \multirow{2}{*}{Hostgroup} & \multicolumn{4}{c|}{Mean latency / \si{\micro\second}} \\
+             \multirow{2}{*}{Host group} & \multicolumn{4}{c|}{Mean latency / \si{\micro\second}} \\
              \cline{2-5}
                                       & SHM-1 & SHM-2 & TCP & IBV\\
              \hline
@@ -969,7 +978,7 @@ End of Tests.
              \hline
             \end{tabular}
             \captionsetup{type=table}
-            \caption{The mean latency over all repeats, split by hostgroup as shown in Figure \ref{fig:compare_latency-hostgroup}}
+            \caption{The mean latency over all repeats, split by host group as shown in Figure \ref{fig:compare_latency-hostgroup}}
         \end{center}
 
 
@@ -986,7 +995,7 @@ End of Tests.
             \centering
             \begin{tabular}{ |c||c|c|c|c|  }
              \hline
-             \multirow{2}{*}{Hostgroup} & \multicolumn{4}{c|}{Mean bandwidth of 1024B messages / \si{\mega\byte\per\second}} \\
+             \multirow{2}{*}{Host group} & \multicolumn{4}{c|}{Mean bandwidth of 1024B messages / \si{\mega\byte\per\second}} \\
              \cline{2-5}
                                       & SHM-1 & SHM-2 & TCP & IBV\\
              \hline
@@ -1006,14 +1015,14 @@ End of Tests.
              \hline
             \end{tabular}
             \captionsetup{type=table}
-            \caption{The mean bandwidth for the 1024B messages split by hostgroup}
+            \caption{The mean bandwidth for the 1024B messages split by host group}
         \end{center}
 
          \begin{center}
             \centering
             \begin{tabular}{ |c||c|c|c|c|  }
              \hline
-             \multirow{2}{*}{Hostgroup} & \multicolumn{4}{c|}{Mean bandwidth of 8192B messages / \si{\mega\byte\per\second}} \\
+             \multirow{2}{*}{Host group} & \multicolumn{4}{c|}{Mean bandwidth of 8192B messages / \si{\mega\byte\per\second}} \\
              \cline{2-5}
                                       & SHM-1 & SHM-2 & TCP & IBV\\
              \hline
@@ -1033,14 +1042,14 @@ End of Tests.
              \hline
             \end{tabular}
             \captionsetup{type=table}
-            \caption{The mean bandwidth for the 8192B messages split by hostgroup}
+            \caption{The mean bandwidth for the 8192B messages split by host group}
         \end{center}
 
          \begin{center}
             \centering
             \begin{tabular}{ |c||c|c|c|c|  }
              \hline
-             \multirow{2}{*}{Hostgroup} & \multicolumn{4}{c|}{Mean bandwidth of 32768B messages/ \si{\mega\byte\per\second}} \\
+             \multirow{2}{*}{Host group} & \multicolumn{4}{c|}{Mean bandwidth of 32768B messages/ \si{\mega\byte\per\second}} \\
              \cline{2-5}
                                       & SHM-1 & SHM-2 & TCP & IBV\\
              \hline
@@ -1060,14 +1069,14 @@ End of Tests.
              \hline
             \end{tabular}
             \captionsetup{type=table}
-            \caption{The mean bandwidth for the 32768B messages split by hostgroup}
+            \caption{The mean bandwidth for the 32768B messages split by host group}
         \end{center}
 
          \begin{center}
             \centering
             \begin{tabular}{ |c||c|c|c|c|  }
              \hline
-             \multirow{2}{*}{Hostgroup} & \multicolumn{4}{c|}{Mean of max bandwidths / \si{\mega\byte\per\second}} \\
+             \multirow{2}{*}{Host group} & \multicolumn{4}{c|}{Mean of max bandwidths / \si{\mega\byte\per\second}} \\
              \cline{2-5}
                                       & SHM-1 & SHM-2 & TCP & IBV\\
              \hline
@@ -1088,7 +1097,7 @@ End of Tests.
              \hline
             \end{tabular}
             \captionsetup{type=table}
-            \caption{The mean of the max bandwidth over all message sizes for each hostgroup }
+            \caption{The mean of the max bandwidth over all message sizes for each host group }
         \end{center}
 
 \end{document}
