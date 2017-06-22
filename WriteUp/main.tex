@@ -724,9 +724,17 @@ echo $(($(cat $COUNT) + 1)) > $COUNT
         \paragraph{}
         The Cloud was the worst performing in this test. With 33.01 GFLOPS over SHM, it was more than 2 GFLOPS behind the next host group. As the other results have shown, this benchmark depends largely on CPU. One reason could be the virtualisation of CPUs which adds an additional overhead that is likely to slow the application down. Although the cloud allocates two virtual CPUs to a physical CPU, this would only throttle the application if more than half of the allocated virtual CPUs were active at a given time and there was competition for execution. From looking at monitoring, for at least some of the tests, the there was not a high load on the hypervisor. Given that the range of results for SHM is low, I would suggest that this wasn't an issue for SHM. However, coupled with network interference from other users, this could be a reason for the large range of results for the Cloud over TCP.
 
-\section{Evaluation}
-
 \section{Conclusion}
+    \paragraph{}
+    Two benchmarks (IMB and HPL) were run over different options for SCARF, LOTUS and the Cloud to measure latency, bandwidth and parallel application performance. Both benchmarks were run between cores on the same host (initially over SHM) and between cores on separate hosts (using TCP and IBV on SCARF). The IMB results for SHM were later split into SHM-1 and SHM-2 spanning either one or two CPUs.
+
+    \paragraph{}
+    The results for all three benchmarks established the expected ranking between the methods of communication: SHM-1, SHM-2 and IBV then TCP. This is in order of increasing latency or decreasing bandwidth and application performance. The difference in latency was orders of magnitude but particularly for larger message sizes and the latest version, IBV was comparable to SHM for bandwidth and application performance. Although the bandwidth for 10Gb Ethernet was reasonably far from SHM, it was also competitive when measuring application performance.
+
+    \paragraph{}
+    MESSAGES TODO
+
+
 
 
 
