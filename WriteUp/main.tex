@@ -634,7 +634,7 @@ echo $(($(cat $COUNT) + 1)) > $COUNT
             Latency is mainly affected by the method of communication. Even ignoring the impact of host group, there is a clear ranking: SHM-1, SHM-2, IBV, TCP. As the processes span more interfaces - between nodes rather than within nodes - latency rises. SHM-1 has the lowest latency, perhaps taking advantage of a shared L3 cache and RAM - allowing each process to directly access the MPI shared buffer. With SHM-2, the distinct CPUs have separate L3 caches and rely on 'QuickPath Interconnect' to access memory allocated to the other processor \cite{intel2009}. Establishing the buffer over this additional protocol will add an extra overhead, explaining the greater latency. Similarly, inter-node communication over TCP/IBV adds another layer of protocols and hardware (e.g. switches, network cards), increasing the time to establish a connection. On SCARF (where direct comparison is possible) IBV is lower latency than TCP. This is also the case when comparing with LOTUS; SCARF's highest average latency for a host group (scarf13 at \SI{6.55}{\micro\second}) is smaller than LOTUS's lowest (broadwell256G at \SI{7.17}{\micro\second}).
 
             \paragraph{}
-            The effect of newer hardware is less clear. Over TCP, SCARF latencies broadly reduce as hardware improves from scarf10 to scarf16. Certainly scarf15's \SI{9.70}{\micro\second} is better than \SI{89.49}{\micro\second} for scarf10. While there was a move from \SI{1}{\giga\byte} to \SI{10}{\giga\byte} Ethernet between scarf14 and scarf15, this can only be part of the explanation because scarf13 and scarf14 also show significantly lower latency than scarf10 with the same Ethernet hardware. The latency results for LOTUS do not depend as significantly on host group with all performing similarly although the newer Broadwell host group (\SI{7.17}{\micro\second}) is lower than the Haswell and Ivybridge host groups (11.05, 11.99 and 10.89 \si{\micro\second} respectively).
+            The effect of newer hardware is less clear. Over TCP, SCARF latencies broadly reduce as hardware improves from scarf10 to scarf16. Certainly scarf15's \SI{9.70}{\micro\second} is better than \SI{89.49}{\micro\second} for scarf10. While there was a move from 1Gb to 10Gb Ethernet between scarf14 and scarf15, this can only be part of the explanation because scarf13 and scarf14 also show significantly lower latency than scarf10 with the same Ethernet hardware. The latency results for LOTUS do not depend as significantly on host group with all performing similarly although the newer Broadwell host group (\SI{7.17}{\micro\second}) is lower than the Haswell and Ivybridge host groups (11.05, 11.99 and 10.89 \si{\micro\second} respectively).
 
             \paragraph{}
             Despite improvements in hardware, the latency results for IBV and SHM remain mainly constant. Most IBV results are around \SI{2}{\micro\second} with scarf10 (\SI{4.38}{\micro\second}) slightly higher. This is perhaps due to older DDR Infiniband (although the similar upgrade from QDR to FDR after scarf14 did not have a noticeable effect). The results show better hardware having minimal effect on latency inside the node with all SCARF/LOTUS host groups at roughly \SI{0.15}{\micro\second} for SHM-1 and \SI{0.32}{\micro\second} for SHM-2.
@@ -649,18 +649,24 @@ echo $(($(cat $COUNT) + 1)) > $COUNT
             \label{analyse-results-imb-bandwidth}
 
             \paragraph{}
-            Figure \ref{fig:compare_bandwidth-hostgroup_max} shows a comparison of the results for bandwidth (see Appendix \ref{appendix:bandwidth-data} for the data).
+            The results for bandwidth are compared by method of communication and hardware. They are presented for three set message sizes and the maximum in Figure \ref{fig:compare_bandwidth-hostgroup_max} (data in Appendix \ref{appendix:bandwidth-data}). As the message size increases, the bandwidth increases because the constant setup time accounts for a smaller proportion of the total time taken.
 
             \paragraph{}
-            In general, for each host group, the ranking of the protocols is the same: SHM-1, SHM-2, IBV and then TCP. In the same way as latency increases, bandwidth TODO
+            Across these message sizes, the ranking is mainly the same as latency: SHM-1, SHM-2, IBV and then TCP. The reason is probably similar; the fastest data rates are achieved at close proximity to the CPU where data can be accessed over many lanes in parallel.
 
+            \paragraph{}
+            The benefit of improvements in hardware is clearer here than with latency. The TCP results for 10Gb Ethernet (scarf15, scarf16 and all of LOTUS) have roughly ten times the throughput as those with only 1Gb Ethernet. At max bandwidth, they both approach their specification (\SI{1250}{\mega\byte\per\second} / \SI{125}{\mega\byte\per\second}), indicating that they are a bottleneck. Over IBV, DDR on scarf10 is consistently the slowest. The benefit of FDR (used after scarf14) over QDR is clear when looking at the max bandwidth achieved (FDR greater than \SI{5500}{\mega\byte\per\second} with QDR less than \SI{3500}{\mega\byte\per\second}).
 
-            The first point to note is that for each message size on each host group, the order of bandwidths is the same: SHM with one CPU, SHM between two CPUs, IBV and then TCP. This is expected as data transfer between CPUs or hosts is generally slower than travelling within them.
+            \paragraph{}
+            Across all message sizes, the SHM values are similar regardless of host group, suggesting that the newer hardware has not improved bandwidth for intra-node communication.
 
-            Infiniband is seen as the faster (and default) networking option on SCARF.
+            \paragraph{}
+            On scarf15/16, the max bandwidth results place IBV and SHM-2 slightly faster than SHM-1. For example, scarf15 had \SI{5145.80}{\mega\byte\per\second}, \SI{5876.91}{\mega\byte\per\second} and \SI{5670.07}{\mega\byte\per\second} for SHM-1, SHM-2, and IBV respectively. Comparing with the similar haswell256G hosts, it is SHM-1 (\SI{7683.80}{\mega\byte\per\second}) which stands out as the outlier. The explanation for this is an open question - the range of values over the repeats was small (\SI{51.39}{\mega\byte\per\second} for scarf15) and at least three different hosts were used suggesting that there is an underlying cause of this rather than a single error.
 
+            \paragraph{}
+            The Cloud outperforms the 1Gb Ethernet but cannot compete with 10Gb Ethernet or IBV. Ignoring scarf14 for the \SI{1024}{\byte} messages (where it came close), the Cloud had a significantly higher bandwidth than the 1Gb Ethernet hosts. For \SI{32768}{\byte} messages, \SI{184.26}{\mega\byte\per\second} is over three times as fast scarf14's \SI{56.77}{\mega\byte\per\second} but still slower than \SI{311.79}{\mega\byte\per\second} (the lowest result accross IBV and 10Gb Ethernet).
 
-             \begin{figure}[H]
+            \begin{figure}[H]
                 \centering
                 \begin{subfigure}{\textwidth}
                   \centering
@@ -690,7 +696,7 @@ echo $(($(cat $COUNT) + 1)) > $COUNT
 
                   \caption{Max bandwidth over all message sizes}
                 \end{subfigure}
-                \caption{Comparison of bandwidths between hostgroups and protocols at different message sizes. Each bar shows the mean over the repeats with the range bars showing the range.}
+                \caption{Comparison of bandwidths between host groups and protocols at different message sizes. Each bar shows the mean over the repeats with the range bars showing the range of repeats.}
                 \label{fig:compare_bandwidth-hostgroup_max}
              \end{figure}
 
