@@ -700,18 +700,29 @@ echo $(($(cat $COUNT) + 1)) > $COUNT
                 \label{fig:compare_bandwidth-hostgroup_max}
              \end{figure}
 
-
-
-
-
-
-
-
-
-
-
-
     \subsection{HPL}
+        \begin{figure}
+            \centering
+            \includegraphics[width=\textwidth]{application_performance}
+            \caption{Comparison of the application performance for different options as measured by HPL. The range over the repeats was small so after the initial IMB results, the experiment was not repeated splitting SHM-1 and SHM-2. The units are GFLOPS which refer to billion floating point operations per second.}
+            \label{fig:application_performance}
+        \end{figure}
+
+        \paragraph{}
+        The results for the HPL benchmarks are compared for the same choices. They are displayed in Figure \ref{fig:application_performance} from the data in Appendix \ref{appendix:hpl-data}.
+
+
+        \paragraph{}
+        As with latency and bandwidth, the same ranking broadly applies for application performance: SHM, IBV then TCP. Although the results are much closer, TCP is 4\% lower than SHM on average while IBV is 0.2\%. TCP performs much better on LOTUS than SCARF where results are comparable to SHM on all but the niche ivybridge2000G. The slightly lower FLOPS for inter-host communication is likely due to TCP and IBV's lower bandwidth and higher latency relative to SHM. Causing communications to take longer, this would have stalled the benchmark while it was waiting to transfer matrix elements.
+
+        \paragraph{}
+        Despite the interconnect ranking, Figure \ref{fig:application_performance} shows that to maximise application performance, choosing a faster CPU (e.g. Broadwell rather than Haswell) should be prioritised over interconnect as every TCP result is greater than the SHM results for the previous generations. There is a greater than linear increase in performance as the SCARF hardware iterates from 2010 to 2015/16 (roughly 35 to 130 GFLOPS). The results for LOTUS's Ivybridge and Haswell agree with their SCARF equivalents (scarf14 and scarf15/16 respectively) and the Broadwell host group achieves the highest results at over 185 GFLOPS for both TCP and SHM.
+
+        \paragraph{}
+        Although the results suggest that the Broadwell host group performed better over TCP than SHM, it is possible that the five SHM repeats were under representative. This could be the result of an external factor, perhaps interference from a busy host operating system. Given that the ranges do overlap, this is not a large cause for concern.
+
+        \paragraph{}
+        The Cloud was the worst performing in this test. With 33.01 GFLOPS over SHM, it was more than 2 GFLOPS behind the next host group. As the other results have shown, this benchmark depends largely on CPU. One reason could be the virtualisation of CPUs which adds an additional overhead that is likely to slow the application down. Although the cloud allocates two virtual CPUs to a physical CPU, this would only throttle the application if more than half of the allocated virtual CPUs were active at a given time and there was competition for execution. From looking at monitoring, for at least some of the tests, the there was not a high load on the hypervisor. Given that the range of results for SHM is low, I would suggest that this wasn't an issue for SHM. However, coupled with network interference from other users, this could be a reason for the large range of results for the Cloud over TCP.
 
 \section{Evaluation}
 
@@ -1104,6 +1115,35 @@ End of Tests.
             \end{tabular}
             \captionsetup{type=table}
             \caption{The mean of the max bandwidth over all message sizes for each host group }
+        \end{center}
+
+    \subsection{HPL Results}
+        \label{appendix:hpl-data}
+        \begin{center}
+            \centering
+            \begin{tabular}{ |c||c|c|c|  }
+             \hline
+             \multirow{2}{*}{Host group} & \multicolumn{3}{c|}{Application Performance / GFLOPS} \\
+             \cline{2-4}
+                                      & SHM & TCP & IBV\\
+             \hline
+                  Cloud & 33.01 & 29.66 & n/a\\
+                  scarf10 & 35.62 & 34.07 & 35.42\\
+                  scarf11 & 41.31 & 39.37 & 41.14\\
+                  scarf12 & 45.06 & 42.79 & 44.94\\
+                  scarf13 & 64.09 & 59.77 & 63.77\\
+                  scarf14 & 75.64 & 70.10 & 75.98\\
+                  scarf15 & 132.06 & 124.66 & 131.66\\
+                  scarf16 & 131.64 & 125.24 & 131.60\\
+                  broadwell256G & 185.32 & 187.62 & n/a\\
+                  haswell256G & 130.50 & 127.54 & n/a\\
+                  ivybridge128G & 73.98 & 74.72 & n/a\\
+                  ivybridge2000G & 72.57 & 69.81 & n/a\\
+                  ivybridge512G & 74.96 & 74.61 & n/a\\
+             \hline
+            \end{tabular}
+            \captionsetup{type=table}
+            \caption{The application performance as measured by HPL for the different options}
         \end{center}
 
 \end{document}
