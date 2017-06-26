@@ -68,7 +68,7 @@ sorting=ynt
 \maketitle
 
 \begin{abstract}
-Two benchmarks (HPL and IMB) are run across SCARF, LOTUS and the SCD Cloud to measure the effect of bandwidth, latency, distributing cores between nodes and using newer hardware on parallel application performance. A common ranking between different methods of communication is shown in the results of all benchmarks (SHM-1, SHM-2, IBV then TCP). Whilst using newer processors is found to have the greatest impact on parallel application performance, both SCARF and LOTUS are shown to be able to perform as effectively between cores on separate hosts as between cores on an individual host - despite lower bandwidth and higher latency. The Cloud performs similarly to the oldest SCARF host (scarf10) but with a higher TCP bandwidth.
+Two benchmarks (HPL and IMB) are run across SCARF, LOTUS and the SCD Cloud to measure the effect of bandwidth, latency, distributing cores between nodes and using newer hardware on parallel application performance. A common ranking between different methods of communication is shown in the results of all benchmarks (SHM-1, SHM-2, IBV then TCP). Whilst using newer processors is found to have the greatest impact on parallel application performance, both SCARF and LOTUS are shown to be able to perform as effectively between cores on separate hosts as on an individual host - despite lower bandwidth and higher latency. The Cloud performs similarly to the oldest SCARF host (scarf10) but with a higher TCP bandwidth.
 \end{abstract}
 
 
@@ -157,7 +157,7 @@ scp ~/.ssh/* <other VM hostname>:~/.ssh/ # copy this setup to the other machine
             \end{code}
 
         \subsubsection{SCARF and LOTUS}
-        On both LOTUS and SCARF, the IMB PingPong benchmark was compiled from source.
+        On both LOTUS and SCARF, the IMB benchmark was compiled from source.
 
             \begin{code}
             \captionof{listing}{Installing IMB on SCARF and LOTUS}
@@ -174,12 +174,12 @@ gmake CC=mpicc
 
         On LOTUS, the HPL binary is located at \verb|/apps/src/hpl/hpl-2.2/bin/Linux_Intel64/xhpl| which is installed using the Intel MKL and Platform MPI libraries.
 
-        On SCARF, HPL is optimised for each processor at \verb|/apps/procspec/hpl/2.2/bin/Linux_Intel64/xhpl|, to avoid this advantage, the SCARF10 (least optimised) version was used for all processors by copying this binary to a shared location between processors (see section \ref{running-HPL-SCARF}).
+        On SCARF, HPL is optimised for each processor at \verb|/apps/procspec/hpl/2.2/bin/Linux_Intel64/xhpl|, to avoid this advantage, the scarf10 (least optimised) version was used for all processors by copying this binary to a shared location between processors (see section \ref{running-HPL-SCARF}).
 
 
 
 
-    \subsection{Running IMB PingPong}
+    \subsection{Running IMB}
 
         \paragraph{}
         In general, the benchmarks are submitted by shell scripts that take care of configuration parameters, platform specific parameters (eg LSF flags) and running repeats of the benchmarks. On the systems where there is a job scheduler (LOTUS and SCARF), these scripts submit the jobs where the benchmarks are actually run. On the Cloud, a cronjob is setup to run the script at regular intervals.
@@ -199,11 +199,9 @@ gmake CC=mpicc
         \subsubsection{SCARF}
             \begin{enumerate}
                 \item Create a top directory and \verb|cd| into it (e.g. \verb|/home/cseg/scarf565/SCARF_IMB|).
-                \item Install IMB PingPong inside this directory as in Code \ref{code:builds-cloud-build-sh}. This should create \verb|imb/imb/src/IMB-MPI1|.
+                \item Install IMB inside this directory as in Code \ref{code:builds-cloud-build-sh}. This should create \verb|imb/imb/src/IMB-MPI1|.
                 \item Submit jobs to run the benchmark for five repeats across each host group. For each host group, run the benchmark between hosts using TCP, using Infiniband and on the same host. Use Code \ref{code:tests-scarf_imb-runimbscarf-sh} from inside the top directory.
                     \begin{code}
-                    \captionof{listing}{Submitting IMB to SCARF}
-                    \label{code:tests-scarf_imb-runimbscarf-sh}
                     \begin{minted}[breaklines=true]{bash}
 #! /bin/bash
 hostgroups=(scarf10 scarf11 scarf12 scarf13 scarf14 scarf15 scarf16)
@@ -238,14 +236,16 @@ mpirun -lsf -prot $pFlag $PWD/imb/imb/src/IMB-MPI1 -iter 1000 -time 200 -msglog 
     done
 done
                 \end{minted}
+                \captionof{listing}{Submitting IMB to SCARF}
+                \label{code:tests-scarf_imb-runimbscarf-sh}
                 \end{code}
             \end{enumerate}
         \subsubsection{LOTUS}
-            The method for running IMB PingPong on LOTUS is similar but there is no Infiniband available and there is a different \verb|mpirun| command.
+            The method for running IMB on LOTUS is similar but there is no Infiniband available and there is a different \verb|mpirun| command.
 
             \begin{enumerate}
                 \item Create a top directory and \verb|cd| into it (e.g. \verb|/home/users/ciddon/JASMIN_IMB|).
-                \item Install IMB PingPong inside this directory as in Code \ref{code:builds-cloud-build-sh}. This should create \verb|imb/imb/src/IMB-MPI1|.
+                \item Install IMB inside this directory as in Code \ref{code:builds-cloud-build-sh}. This should create \verb|imb/imb/src/IMB-MPI1|.
                 \item Submit jobs to run the benchmark for 5 repeats across each host group. For each host group, run the benchmark between hosts and within the same host. Use Code \ref{code:tests-jasmin_hpl-runimbjasmin-sh} from inside the top directory.
 
                     \begin{code}
@@ -282,13 +282,13 @@ done
         \subsubsection{Cloud}
 
             \paragraph{}
-            Two virtual machines are required to run IMB PingPong. The main VM (where the job is initialised from) must have at least two cores.
+            Two virtual machines are required to run IMB. The main VM (where the job is initialised from) must have at least two cores.
 
             \paragraph{}
             Using \url{http://mimic.gridpp.rl.ac.uk/}, under \verb|Cloud -> Open Nebula|, find the VMs and ensure that they are on different hypervisors (by clicking for more information).
 
             \begin{enumerate}
-                \item Install IMB PingPong in the home directory of both VMs and setup SSH as in section \ref{cloud-installation}.
+                \item Install IMB in the home directory of both VMs and setup SSH as in section \ref{cloud-installation}.
                 \item Create a top directory on the main VM eg \verb|/home/tan49775/Cloud_IMB|.
                 \item Create a script (Code \ref{code:tests-cloud_imb-runimbcloud-sh}) in this top directory which will run a repeat of the benchmark each time it is called, incrementing a count file to keep track of the number of repeats. The script ensures the benchmark is run 30 times within the same host and then 30 times between the two VMs. Use a different \verb|HOME_DIR|, \verb|START_DIR| and host address.
                     \begin{code}
@@ -348,7 +348,7 @@ echo $(($(cat $COUNT) + 1)) > $COUNT
 
         \subsubsection{Interpreting Results}
             \paragraph{}
-            The standard output from IMB PingPong is shown in Appendix \ref{appendix:imb-example-output}. As explained in Section \ref{overview-of-methods}, latency is recorded from the first entry in the \verb|t[usec]| column - where the message size is zero. Bandwidth is recorded from the \verb|Mbytes/sec| column. The message sizes 1024B, 8192B and 32768B are focused on to give a range of results. Additionally, the maximum bandwidth achieved over all message sizes was recorded.
+            The standard output from IMB is shown in Appendix \ref{appendix:imb-example-output}. As explained in Section \ref{overview-of-methods}, latency is recorded from the first entry in the \verb|t[usec]| column - where the message size is zero. Bandwidth is recorded from the \verb|Mbytes/sec| column. The message sizes 1024B, 8192B and 32768B are focused on to give a range of results. Additionally, the maximum bandwidth achieved over all message sizes was recorded.
 
 
     \subsection{Running HPL}
@@ -559,7 +559,7 @@ echo $(($(cat $COUNT) + 1)) > $COUNT
     \paragraph{}
     Note that some LOTUS benchmarks were submitted to LSF differently. For all jobs on 'ivybridge2000G' and three HPL runs on 'ivybridge512G' over two hosts, the jobs were waiting for weeks without being run. Instead, a host reservation was used - removing the \mintinline{bash}{-m} parameter and adding a \mintinline{bash}{-U}. The different bsub parameters should have had no effect on the results as they only define how the job is submitted - all benchmarks were run exclusively.
 
-    \subsection{IMB PingPong}
+    \subsection{IMB}
 
         \subsubsection{SHM first look and adaptions to method}
             \label{subsubsection:SHM-first-look}
@@ -776,7 +776,7 @@ echo $(($(cat $COUNT) + 1)) > $COUNT
 
 
 
-
+\clearpage
 
 
 \appendix
@@ -829,6 +829,8 @@ RANLIB       = echo
         \end{minted}
         \end{code}
 
+    \clearpage
+
     \subsection{IMB Example Output}
         \label{appendix:imb-example-output}
 
@@ -865,6 +867,8 @@ RANLIB       = echo
       8388608         1000      1714.74      4665.43
      16777216         1000      3617.98      4422.35
         \end{minted}
+
+    \clearpage
 
     \subsection{HPL Configuration File}
         \label{appendix:hpl-conf}
@@ -903,6 +907,7 @@ not_used     output file name (if any)
 8            memory alignment in double (> 0)
         \end{minted}
 
+    \clearpage
 
     \subsection{HPL Example Output}
         \label{appendix:hpl-example-output}
