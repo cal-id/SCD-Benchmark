@@ -963,11 +963,16 @@ End of Tests.
 ================================================================================
 
         \end{minted}
+
+    \clearpage
+
     \subsection{Latency Data}
         \label{appendix:latency-data}
 
         \begin{center}
             \centering
+            \captionsetup{type=table}
+            \caption{The mean latency over all repeats, split by host group as shown in Figure \ref{fig:compare_latency-hostgroup}}
             \begin{tabular}{ |c||c|c|c|c|  }
              \hline
              \multirow{2}{*}{Host group} & \multicolumn{4}{c|}{Mean latency / \si{\micro\second}} \\
@@ -990,9 +995,9 @@ End of Tests.
 
              \hline
             \end{tabular}
-            \captionsetup{type=table}
-            \caption{The mean latency over all repeats, split by host group as shown in Figure \ref{fig:compare_latency-hostgroup}}
+
         \end{center}
+
 
 
 
@@ -1006,6 +1011,8 @@ End of Tests.
 
         \begin{center}
             \centering
+            \captionsetup{type=table}
+            \caption{The mean bandwidth for the 1024B messages split by host group}
             \begin{tabular}{ |c||c|c|c|c|  }
              \hline
              \multirow{2}{*}{Host group} & \multicolumn{4}{c|}{Mean bandwidth of 1024B messages / \si{\mega\byte\per\second}} \\
@@ -1027,12 +1034,15 @@ End of Tests.
                 ivybridge512G & 2065.02 & 1167.25 & 69.32 & n/a\\
              \hline
             \end{tabular}
-            \captionsetup{type=table}
-            \caption{The mean bandwidth for the 1024B messages split by host group}
+
         \end{center}
+
+        \clearpage
 
          \begin{center}
             \centering
+            \captionsetup{type=table}
+            \caption{The mean bandwidth for the 8192B messages split by host group}
             \begin{tabular}{ |c||c|c|c|c|  }
              \hline
              \multirow{2}{*}{Host group} & \multicolumn{4}{c|}{Mean bandwidth of 8192B messages / \si{\mega\byte\per\second}} \\
@@ -1054,12 +1064,14 @@ End of Tests.
                 ivybridge512G & 3785.00 & 1983.11 & 295.25 & n/a\\
              \hline
             \end{tabular}
-            \captionsetup{type=table}
-            \caption{The mean bandwidth for the 8192B messages split by host group}
+
         \end{center}
+
 
          \begin{center}
             \centering
+            \captionsetup{type=table}
+            \caption{The mean bandwidth for the 32768B messages split by host group}
             \begin{tabular}{ |c||c|c|c|c|  }
              \hline
              \multirow{2}{*}{Host group} & \multicolumn{4}{c|}{Mean bandwidth of 32768B messages/ \si{\mega\byte\per\second}} \\
@@ -1081,12 +1093,13 @@ End of Tests.
                 ivybridge512G & 6033.94 & 2946.58 & 429.37 & n/a\\
              \hline
             \end{tabular}
-            \captionsetup{type=table}
-            \caption{The mean bandwidth for the 32768B messages split by host group}
+
         \end{center}
 
          \begin{center}
             \centering
+            \captionsetup{type=table}
+            \caption{The mean of the max bandwidth over all message sizes for each host group }
             \begin{tabular}{ |c||c|c|c|c|  }
              \hline
              \multirow{2}{*}{Host group} & \multicolumn{4}{c|}{Mean of max bandwidths / \si{\mega\byte\per\second}} \\
@@ -1109,14 +1122,15 @@ End of Tests.
 
              \hline
             \end{tabular}
-            \captionsetup{type=table}
-            \caption{The mean of the max bandwidth over all message sizes for each host group }
+
         \end{center}
 
     \subsection{HPL Results}
         \label{appendix:hpl-data}
         \begin{center}
             \centering
+            \captionsetup{type=table}
+            \caption{The application performance as measured by HPL for the different options}
             \begin{tabular}{ |c||c|c|c|  }
              \hline
              \multirow{2}{*}{Host group} & \multicolumn{3}{c|}{Application Performance / GFLOPS} \\
@@ -1138,8 +1152,7 @@ End of Tests.
                   ivybridge512G & 74.96 & 74.61 & n/a\\
              \hline
             \end{tabular}
-            \captionsetup{type=table}
-            \caption{The application performance as measured by HPL for the different options}
+
         \end{center}
 
 \end{document}
