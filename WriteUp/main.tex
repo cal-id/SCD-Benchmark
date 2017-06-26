@@ -126,7 +126,7 @@ tar -xvf IMB_2017.tgz
 source /etc/profile.d/modules.sh   # enable environment-modules
 module load openmpi-1.10-x86_64    # load the MPI module
 cd imb/imb/src
-make all CC=mpicc                  # compile
+make CC=mpicc                      # compile
 cd -
 
 # Install HPL
@@ -167,7 +167,7 @@ scp ~/.ssh/* <other VM hostname>:~/.ssh/ # copy this setup to the other machine
 wget https://software.intel.com/sites/default/files/managed/a3/53/IMB_2017.tgz
 tar -xvf IMB_2017.tgz
 cd imb/imb/src
-gmake all CC=mpicc
+gmake CC=mpicc
             \end{minted}
             \end{code}
 
@@ -210,7 +210,7 @@ hostgroups=(scarf10 scarf11 scarf12 scarf13 scarf14 scarf15 scarf16)
 # Make the outputs directory if it doesn't exist
 mkdir -p $PWD/outputs
 for specificHost in ${hostgroups[@]}; do # For each hostgroup
-    for perTile in 1 2; do # Span one node or two
+    for perTile in 1 2; do # Span one (2) node or two (1)
         if [ $perTile -eq 1 ]; then
             # If going between nodes, specify different interconnect flags
             pFlagOptions=(-TCP -IBV)
@@ -237,7 +237,6 @@ mpirun -lsf -prot $pFlag $PWD/imb/imb/src/IMB-MPI1 -iter 1000 -time 200 -msglog 
         done
     done
 done
-
                 \end{minted}
                 \end{code}
             \end{enumerate}
@@ -258,7 +257,7 @@ hostgroups=(ivybridge512G ivybridge2000G haswell256G ivybridge128G broadwell256G
 # Make the outputs directory if it doesn't exist
 mkdir -p $PWD/outputs
 for specificHost in ${hostgroups[@]}; do # For each hostgroup
-    for perTile in 1 2; do # Span one or two nodes
+    for perTile in 1 2; do # Span one (2) or two (2) nodes
         for repeat in 1 2 3 4 5; do # Repeat the benchmark
 
 bsub << %EndOfInput%
@@ -394,7 +393,7 @@ hostgroups=(scarf10 scarf11 scarf12 scarf13 scarf14 scarf15 scarf16)
 # Make the outputs directory if it doesn't exist
 mkdir -p $PWD/outputs
 for specificHost in ${hostgroups[@]}; do # For each hostgroup
-    for perTile in 2 4; do # Span one node or two
+    for perTile in 2 4; do # Span one (2) node or two (4)
         if [ $perTile -eq 2 ]; then
             # If going between nodes, specify different interconnect flags
             pFlagOptions=(-TCP -IBV)
@@ -902,7 +901,6 @@ not_used     output file name (if any)
 0            U  in (0=transposed,1=no-transposed) form
 1            Equilibration (0=no,1=yes)
 8            memory alignment in double (> 0)
-
         \end{minted}
 
 
