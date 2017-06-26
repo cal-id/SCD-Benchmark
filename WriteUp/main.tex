@@ -98,7 +98,7 @@ Two benchmarks (HPL and IMB) are run across SCARF, LOTUS and the SCD Cloud to me
     There are two benchmarking applications to run on each system.
 
     \begin{description}
-        \item[IMB PingPong] uses MPI to send messages of increasing size both ways between two processes [\cite{intel2016}]. Latency is the average time for the message of zero size to cross one way between the two processes. Bandwidth is the rate of throughput at different message sizes. The only dependency to run this benchmark is an MPI library.
+        \item[IMB PingPong] uses MPI to send messages of increasing size both ways between two processes [\cite{intel2016}]. Latency is the average time for the message of zero size to cross one way between the two processes. Bandwidth is the throughput at different message sizes. The only dependency to run this benchmark is an MPI library.
         \item[HPL TOP500] solves a large matrix problem over distributed compute and memory resources [\cite{hpl2016}]. The time taken to solve the problem gives a measure of parallel application performance in FLOPS (floating point operations per second). The software relies on a linear algebra library as well as an MPI library.
     \end{description}
 
@@ -718,7 +718,7 @@ echo $(($(cat $COUNT) + 1)) > $COUNT
         Although the results suggest that the Broadwell host group performed better over TCP than SHM, it is possible that the five SHM repeats were under representative. This could be the result of an external factor, perhaps interference from a busy host operating system. Given that the ranges do overlap, this is not a large cause for concern.
 
         \paragraph{}
-        The Cloud was the worst performing in this test. With 33.01 GFLOPS over SHM, it was more than 2 GFLOPS behind the next host group. As the other results have shown, this benchmark depends largely on CPU. One reason could be the virtualisation of CPUs which adds an additional overhead that is likely to slow the application down. Although the cloud allocates two virtual CPUs to a physical CPU, this would only throttle the application if more than half of the allocated virtual CPUs were active at a given time and there was competition for execution. From looking at monitoring, for at least some of the tests, the there was not a high load on the hypervisor. Given that the range of results for SHM is low, I would suggest that this wasn't an issue for SHM. However, coupled with network interference from other users, this could be a reason for the large range of results for the Cloud over TCP.
+        The Cloud was the worst performing in this test. With 33.01 GFLOPS over SHM, it was over 2 behind the next host group. As the other results have shown, this benchmark depends largely on CPU. One reason could be the virtualisation of CPUs which adds an additional overhead that is likely to slow the application down. Although the cloud allocates two virtual CPUs to a physical CPU, this would only throttle the application if more than half of the allocated virtual CPUs were active at a given time and there was competition for execution. From looking at monitoring, for at least some of the tests, there was not a high load on the hypervisor. Given that the range of results for SHM is low, I would suggest that this wasn't an issue for SHM. However, coupled with network interference from other users, this could be a reason for the large range of results for the Cloud over TCP.
 
 \section{Conclusion}
     \paragraph{}
@@ -728,10 +728,10 @@ echo $(($(cat $COUNT) + 1)) > $COUNT
     The results for all three benchmarks established the expected ranking between the methods of communication: SHM-1, SHM-2, IBV then TCP. This is in order of increasing latency or decreasing bandwidth and application performance. The difference in latency was orders of magnitude but particularly for larger message sizes and the latest version, IBV was comparable to SHM for bandwidth and application performance. Although the bandwidth for 10Gb Ethernet was reasonably far from SHM, it was also competitive when measuring application performance.
 
     \paragraph{}
-    The impact of newer hardware on latency and bandwidth was varied. The move from 1Gb Ethernet to 10Gb Ethernet on SCARF reduced latency and increased bandwidth, especially on large message sizes. Similarly the move from DDR through QDR to FDR over IBV increased bandwidth. However this change didn't have a clear impact on latency. Also, newer processors did not seem to have a significant impact on SHM latency or bandwidth over SHM-1 or SHM-2.
+    The impact of newer hardware on latency and bandwidth was varied. The move from 1Gb Ethernet to 10Gb Ethernet on SCARF reduced latency and increased bandwidth, especially on large message sizes. Similarly the move from DDR through QDR to FDR over IBV increased bandwidth. However this change didn't have a clear impact on latency. Also, newer processors did not seem to have a significant impact on latency or bandwidth over SHM-1 or SHM-2.
 
     \paragraph{}
-    For application performance, newer processors were the key factor determining the results. It was notable that the inter-node communication (TCP on LOTUS and IBV on SCARF) achieved results similar to SHM which is promising for large scale parallel applications.
+    For application performance, newer processors were the key factor determining the results. However, it was notable that the inter-node communication (TCP on LOTUS and IBV on SCARF) achieved results similar to SHM which is promising for large scale parallel applications.
 
     \paragraph{}
     For bandwidth and latency, the Cloud performed close to SCARF and LOTUS over SHM (although closer to SHM-2 than SHM-1 without a CPU maping). Over TCP, it was competitive against SCARF's 1Gb Ethernet but was far behind TCP on LOTUS and IBV on SCARF. The parallel application performance was the lowest of all host groups, perhaps due to the virtualised CPUs.
