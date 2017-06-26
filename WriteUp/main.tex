@@ -98,7 +98,7 @@ This is the abstract which is definitely TODO!
 
     \begin{description}
         \item[IMB PingPong] uses MPI to send messages of increasing size both ways between two processes \cite{intel2016}. Latency is the average time for the message of zero size to cross one way between the two processes. Bandwidth is the rate of throughput at different message sizes. The only dependency to run this benchmark is an MPI library.
-        \item[HPL TOP500] solves a large matrix problem over distributed compute and memory resources \cite{hpl2016}. The time taken to solve the problem gives a measure of parallel application performance in flops (floating point operations per second). The software relies on a linear algebra library as well as an MPI library.
+        \item[HPL TOP500] solves a large matrix problem over distributed compute and memory resources \cite{hpl2016}. The time taken to solve the problem gives a measure of parallel application performance in FLOPS (floating point operations per second). The software relies on a linear algebra library as well as an MPI library.
     \end{description}
 
     \paragraph{}
@@ -374,7 +374,7 @@ echo $(($(cat $COUNT) + 1)) > $COUNT
             The main parameter is 'problem size' (\verb|N|)  which is the side length of the matrix to be solved. According to \cite{hpl2016}, the largest size that will fit in memory is recommended. The Cloud limits users to 20GB of memory and each element in the matrix is a double precision float (8 bytes). This means that a total of $2.5 \times 10 ^ 9$ elements can be used. Using the recommend 80\% figure (to leave room for the OS), this gives a side length of around 44721. It is also beneficial to have a multiple of NB so 44640 was used.
 
             \paragraph{}
-            Provided the same file is used for each test (to an extent) the content of this file is insignificant - it will still provide a comparison of parallel application performance. Where possible, advice in the "FAQ" and "tuning" sections of \cite{hpl2016} was followed, using default or suggested values to attempt to remain neutral. Of course, it would be possible to tune this configuration for each setup and achieve some faster speeds but this would likely be at the expense of other setups and introduce a bias. Any case where there was no default value given is justified above.
+            Provided the same file is used for each test (to an extent) the content of this file is insignificant - it will still provide a comparison of parallel application performance. Where possible, advice in the 'FAQ' and 'tuning' sections of \cite{hpl2016} was followed, using default or suggested values to attempt to remain neutral. Of course, it would be possible to tune this configuration for each setup and achieve some faster speeds but this would likely be at the expense of other setups and introduce a bias. Any case where there was no default value given is justified above.
 
 
 
@@ -631,7 +631,7 @@ echo $(($(cat $COUNT) + 1)) > $COUNT
             \end{figure}
 
             \paragraph{}
-            Latency is mainly affected by the method of communication. Even ignoring the impact of host group, there is a clear ranking: SHM-1, SHM-2, IBV, TCP. As the processes span more interfaces - between nodes rather than within nodes - latency rises. SHM-1 has the lowest latency, perhaps taking advantage of a shared L3 cache and RAM - allowing each process to directly access the MPI shared buffer. With SHM-2, the distinct CPUs have separate L3 caches and rely on 'QuickPath Interconnect' to access memory allocated to the other processor \cite{intel2009}. Establishing the buffer over this additional protocol will add an extra overhead, explaining the greater latency. Similarly, inter-node communication over TCP/IBV adds another layer of protocols and hardware (e.g. switches, network cards), increasing the time to establish a connection. On SCARF (where direct comparison is possible) IBV is lower latency than TCP. This is also the case when comparing with LOTUS; SCARF's highest average latency for a host group (scarf13 at \SI{6.55}{\micro\second}) is smaller than LOTUS's lowest (broadwell256G at \SI{7.17}{\micro\second}).
+            Latency is mainly affected by the method of communication. Even ignoring the impact of host group, there is a clear ranking: SHM-1, SHM-2, IBV then TCP. As the processes span more interfaces - between nodes rather than within nodes - latency rises. SHM-1 has the lowest latency, perhaps taking advantage of a shared L3 cache and RAM - allowing each process to directly access the MPI shared buffer. With SHM-2, the distinct CPUs have separate L3 caches and rely on 'QuickPath Interconnect' to access memory allocated to the other processor \cite{intel2009}. Establishing the buffer over this additional protocol will add an extra overhead, explaining the greater latency. Similarly, inter-node communication over TCP/IBV adds another layer of protocols and hardware (e.g. switches, network cards), increasing the time to establish a connection. On SCARF (where direct comparison is possible) IBV is lower latency than TCP. This is also the case when comparing with LOTUS; SCARF's highest average latency for a host group over IBV (scarf13 at \SI{6.55}{\micro\second}) is smaller than LOTUS's lowest over TCP (broadwell256G at \SI{7.17}{\micro\second}).
 
             \paragraph{}
             The effect of newer hardware is less clear. Over TCP, SCARF latencies broadly reduce as hardware improves from scarf10 to scarf16. Certainly scarf15's \SI{9.70}{\micro\second} is better than \SI{89.49}{\micro\second} for scarf10. While there was a move from 1Gb to 10Gb Ethernet between scarf14 and scarf15, this can only be part of the explanation because scarf13 and scarf14 also show significantly lower latency than scarf10 with the same Ethernet hardware. The latency results for LOTUS do not depend as significantly on host group with all performing similarly although the newer Broadwell host group (\SI{7.17}{\micro\second}) is lower than the Haswell and Ivybridge host groups (11.05, 11.99 and 10.89 \si{\micro\second} respectively).
@@ -729,28 +729,16 @@ echo $(($(cat $COUNT) + 1)) > $COUNT
     Two benchmarks (IMB and HPL) were run over different options for SCARF, LOTUS and the Cloud to measure latency, bandwidth and parallel application performance. Both benchmarks were run between cores on the same host (initially over SHM) and between cores on separate hosts (using TCP and IBV on SCARF). The IMB results for SHM were later split into SHM-1 and SHM-2 spanning either one or two CPUs.
 
     \paragraph{}
-    The results for all three benchmarks established the expected ranking between the methods of communication: SHM-1, SHM-2 and IBV then TCP. This is in order of increasing latency or decreasing bandwidth and application performance. The difference in latency was orders of magnitude but particularly for larger message sizes and the latest version, IBV was comparable to SHM for bandwidth and application performance. Although the bandwidth for 10Gb Ethernet was reasonably far from SHM, it was also competitive when measuring application performance.
+    The results for all three benchmarks established the expected ranking between the methods of communication: SHM-1, SHM-2, IBV then TCP. This is in order of increasing latency or decreasing bandwidth and application performance. The difference in latency was orders of magnitude but particularly for larger message sizes and the latest version, IBV was comparable to SHM for bandwidth and application performance. Although the bandwidth for 10Gb Ethernet was reasonably far from SHM, it was also competitive when measuring application performance.
 
     \paragraph{}
-    MESSAGES TODO
+    The impact of newer hardware on latency and bandwidth was varied. The move from 1Gb Ethernet to 10Gb Ethernet on SCARF reduced latency and increased bandwidth, especially on large message sizes. Similarly the move from DDR through QDR to FDR over IBV increased bandwidth. However this change didn't have a clear impact on latency. Also, newer processors did not seem to have a significant impact on SHM latency or bandwidth over SHM-1 or SHM-2.
 
+    \paragraph{}
+    For application performance, newer processors were the key factor determining the results. It was notable that the inter-node communication (TCP on LOTUS and IBV on SCARF) achieved results similar to SHM which is promising for large scale parallel applications.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    \paragraph{}
+    For bandwidth and latency, the Cloud performed close to SCARF and LOTUS over SHM (although closer to SHM-2 than SHM-1 without a CPU maping). Over TCP, it was competitive against SCARF's 1Gb Ethernet but was far behind TCP on LOTUS and IBV on SCARF. The parallel application performance was the lowest of all host groups, perhaps due to the virtualised CPUs.
 
 
 
