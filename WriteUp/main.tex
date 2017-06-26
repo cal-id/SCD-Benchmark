@@ -68,7 +68,7 @@ sorting=ynt
 \maketitle
 
 \begin{abstract}
-This is the abstract which is definitely TODO!
+Two benchmarks (HPL and IMB) are run across SCARF, LOTUS and the SCD Cloud to measure the effect of bandwidth, latency, distributing cores between nodes and using newer hardware on parallel application performance. A common ranking between different methods of communication is shown in the results of all benchmarks (SHM-1, SHM-2, IBV then TCP). Whilst using newer processors is found to have the greatest impact on parallel application performance, both SCARF and LOTUS are shown to be able to perform as effectively between cores on separate hosts as between cores on an individual host - despite lower bandwidth and higher latency. The Cloud performs similarly to the oldest SCARF host (scarf10) but with a higher TCP bandwidth.
 \end{abstract}
 
 
@@ -82,13 +82,14 @@ This is the abstract which is definitely TODO!
 
     \subsection{In this project}
         \paragraph{}
-        Comparison metrics are gathered for parallel application performance across three SCD services - SCARF, LOTUS and the SCD Cloud. The aim is to provide results that can inform deployment decisions for parallel applications using the message passing interface (MPI) libraries going forward.
+        Comparison metrics are gathered for parallel application performance across three SCD services - SCARF, LOTUS and the SCD Cloud. The aim is to provide results that can inform deployment decisions for parallel applications using the Message Passing Interface (MPI) libraries going forward.
 
         \paragraph{}
         Two specific metrics are recorded - bandwidth and latency - using the IMB PingPong benchmark. Application performance is then measured more generally according to the results from the HPL TOP500 test. On SCARF and LOTUS, these are taken on cores on the same node, spanning different nodes, and on different hardware versions. On the Cloud, they are taken from one VM and across two VMs (on different hypervisors).
 
     \subsection{Report Layout}
-    TODO!
+        \paragraph{}
+        This report starts by introducing the benchmarks and explaining how they were set up. Detailed methods for running them are set out to allow reproducibility. The results are analysed, first to explain small adaptions to the method and then for comparison between different options. In the appendices, there are example outputs from each of the benchmarks and the data in tabulated form.
 
 \section{Methods}
 
@@ -173,7 +174,7 @@ gmake all CC=mpicc
 
         On LOTUS, the HPL binary is located at \verb|/apps/src/hpl/hpl-2.2/bin/Linux_Intel64/xhpl| which is installed using the Intel MKL and Platform MPI libraries.
 
-        On SCARF, HPL is optimised for each processor at \verb|/apps/procspec/hpl/2.2/bin/Linux_Intel64/xhpl|, to avoid this optimisation advantage, the SCARF10 (least optimised) version was used for all processors by copying this binary to a shared location between processors (see section \ref{running-HPL-SCARF}).
+        On SCARF, HPL is optimised for each processor at \verb|/apps/procspec/hpl/2.2/bin/Linux_Intel64/xhpl|, to avoid this advantage, the SCARF10 (least optimised) version was used for all processors by copying this binary to a shared location between processors (see section \ref{running-HPL-SCARF}).
 
 
 
@@ -189,10 +190,10 @@ gmake all CC=mpicc
         IMB is configured by command line parameters.
 
         \begin{description}
-            \item[iter n] ensures that \verb|n| repeats of each message size are taken and averaged. 1000 was chosen because it was the largest number of repeats that maintained a reasonable time to run on the slowest infrastructure (Cloud, between two VMs). It was also the default for smaller message sizes.
-            \item[time t] sets a maximum time \verb|t|(s) for all repeats of a message size. 200 was chosen because it is significantly high such that this maximum was never reached.
-            \item[msglog a:b] sets a minimum and maximum ($2^{a}$, $2^{b}$) for the message sizes.
-            \item[iter\_policy] sets the behaviour with large message sizes and whether to reduce the number of repeats. Given that the number of repeats is feasible, setting this to \verb|off| means that the same number of repeats are tested for each message size.
+            \item[-iter n] ensures that \verb|n| repeats of each message size are taken and averaged. 1000 was chosen because it was the largest number of repeats that maintained a reasonable time to run on the slowest infrastructure (Cloud, between two VMs). It was also the default for smaller message sizes.
+            \item[-time t] sets a maximum time \verb|t|(s) for all repeats of a message size. 200 was chosen because it is significantly high such that this maximum was never reached.
+            \item[-msglog a:b] sets a minimum and maximum ($2^{a}$, $2^{b}$) for the message sizes.
+            \item[-iter\_policy] sets the behaviour with large message sizes and whether to reduce the number of repeats. Given that the number of repeats is feasible, setting this to \verb|off| means that the same number of repeats are tested for each message size.
         \end{description}
 
         \subsubsection{SCARF}
@@ -348,11 +349,7 @@ echo $(($(cat $COUNT) + 1)) > $COUNT
 
         \subsubsection{Interpreting Results}
             \paragraph{}
-            The standard output from IMB PingPong is shown in Appendix \ref{appendix:imb-example-output}. As explained in Section \ref{overview-of-methods}, latency is recorded from the first entry in the \verb|t[usec]| column - where the message size is zero. Bandwidth is recorded from the \verb|Mbytes/sec| column. Different message sizes are of interest.
-            TODO: NEATEN THIS UP
-
-
-
+            The standard output from IMB PingPong is shown in Appendix \ref{appendix:imb-example-output}. As explained in Section \ref{overview-of-methods}, latency is recorded from the first entry in the \verb|t[usec]| column - where the message size is zero. Bandwidth is recorded from the \verb|Mbytes/sec| column. The message sizes 1024B, 8192B and 32768B are focused on to give a range of results. Additionally, the maximum bandwidth achieved over all message sizes was recorded.
 
 
     \subsection{Running HPL}
