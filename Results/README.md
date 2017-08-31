@@ -1,3 +1,3 @@
 # Results
 
-The results from the tests live here
+The test results are here.
